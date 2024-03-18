@@ -42,7 +42,10 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
-
+import ItemDetails from './pages/ItemDetails';
+import Details from './pages/Details';
+import Details2 from './pages/Details2';
+import { AppProvider } from './contexts/AppContext';
 
 setupIonicReact();
 const queryClient= new QueryClient();
@@ -53,7 +56,9 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
 
       <CssVarsProvider>
+        <AppProvider>
         <AppContent />
+        </AppProvider>
       </CssVarsProvider>
       </QueryClientProvider>
     </IonApp>
@@ -93,6 +98,13 @@ const AppContent: React.FC = () => {
       <Route exact path="/"><Redirect to="/home" /></Route>
       <Route path="/budget" component={CompteBdg} />
       <Route exact path='/iteminfo' component={ItemInfo}/>
+      <Route exact path='/iteminfo/iteminfodetail' component={ItemDetails}/>
+      <Route exact path='/details' component={Details}/>
+      <Route exact path='/details2' component={Details2}/>
+
+
+  
+
       
       
     </IonRouterOutlet>

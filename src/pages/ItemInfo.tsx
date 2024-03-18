@@ -2,31 +2,51 @@ import React from 'react'
 import{
     IonBackButton,
     IonButtons,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardSubtitle,
     IonContent,
     IonHeader,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonLoading,
     IonPage,
     IonTitle,
     IonToolbar,
     } from "@ionic/react";
 
-    import { useHistory, useParams } from 'react-router';
-import Table from '../components/Table';
+    import { useHistory } from "react-router";
+
+import { useQuery } from '@tanstack/react-query';
+import { getAvenantsByProjectId } from '../api/api';
+import useColumns from '../hooks/useColumns';
+import InfoCard from '../components/InfoCard';
+import TableCard from '../components/TableCard';
+import { useAppContext } from '../contexts/AppContext';
 
 
 
+//this is the BDG screen 
 
 const ItemInfo :React.FC = () => {
 
-    const { AllRowData , displayedRowData}:any = useHistory().location.state ?? {}; 
-    console.log('received params', AllRowData, displayedRowData);
+    const { AllRowData , displayedRowData , currrentScreen} :any = useHistory().location.state ?? {}; 
+    const {projectId,setAvenantId}=useAppContext();
+
+
+
+    const { isPending, isError, data } = useQuery({
+      queryKey: ['avenants',projectId],
+      queryFn: ()=> getAvenantsByProjectId(projectId),
+    })
+
+
+    const columns = useColumns(data);
+    const route = useHistory();
+
+
+
+
+    const handleRowClick = (row:any) => {
+      setAvenantId(row.original.id);
+     route.push({ pathname: "/iteminfo/iteminfodetail"  , state: { AllRowData: row.original , displayedRowData: row._valuesCache   } });
+  
+    };
+
 
   return (
     <IonPage>
@@ -40,54 +60,10 @@ const ItemInfo :React.FC = () => {
     </IonToolbar>
   </IonHeader>
   <IonContent>
- 
-    <IonCard>
-    <IonCardHeader >
-        <h1 className='text-center'>
-            
-            {Object.entries(displayedRowData).map(([key, value]: [string, any]) => {
 
-                        return (<></>)
-                        
-            })}
-         </h1>
+   <InfoCard AllRowData={AllRowData}  displayedData={displayedRowData} currentInfo={"BDG"}/>
+   <TableCard title='Avenants'  data={data} isError={isError} isPending={isPending} columns={columns} handleRwoClick={handleRowClick} />
 
-    </IonCardHeader>
-
-    <IonCardContent>
-
-
-     
-
-
-    <IonList>
-
-    {Object.entries(displayedRowData).map(([key, value]: [string, any]) => {
-
-                return (<IonItem>
-                <IonLabel>{key + value}</IonLabel>
-                    
-                </IonItem>)
-                }
-            )}
-       
-        </IonList>
-
-
-
-    </IonCardContent>
-    </IonCard>
-
-
-
-        <IonToolbar>
-            <IonTitle >
-                Détails
-            </IonTitle>
-        </IonToolbar>
-{/*<Table onRowClick={()=>{}}/>
-
-  */}
 
 </IonContent>
 </IonPage>

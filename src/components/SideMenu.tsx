@@ -69,9 +69,14 @@ const SideMenu:React.FC = () => {
     },
   ];
 
+
+  const closeMenu = () => {
+    (document.getElementById('menu') as HTMLIonMenuElement)?.close();
+  }
+
   return (
     
-    <IonMenu contentId="main" type="overlay">
+    <IonMenu id="menu" contentId="main" type="overlay">
       <IonHeader>
         <IonToolbar>
           <IonTitle>Menu</IonTitle>
@@ -93,7 +98,7 @@ const SideMenu:React.FC = () => {
                 {appPage.content.map((content, contentIndex) => (
               <IonItem detail={false} slot="content" key={contentIndex}
               color={location.pathname.includes( content.path) ? 'primary' : ''}
-              button routerLink={content.path}>
+              button onClick={closeMenu} routerLink={content.path}>
                 <IonLabel >{content.label}</IonLabel>
               </IonItem>
             ))}
