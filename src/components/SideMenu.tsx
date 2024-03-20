@@ -82,7 +82,7 @@ const SideMenu:React.FC = () => {
           <IonTitle>Menu</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <IonContent>
 
       <IonAccordionGroup>
 

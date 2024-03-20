@@ -62,7 +62,10 @@ const ItemInfo :React.FC = () => {
   <IonContent>
 
    <InfoCard AllRowData={AllRowData}  displayedData={displayedRowData} currentInfo={"BDG"}/>
-   <TableCard title='Avenants'  data={data} isError={isError} isPending={isPending} columns={columns} handleRwoClick={handleRowClick} />
+   <TableCard title='Avenants'   data={data} isError={isError} isPending={isPending} columns={columns} 
+   handleRwoClick={handleRowClick} 
+   enableEditing={true}
+   />
 
 
 </IonContent>

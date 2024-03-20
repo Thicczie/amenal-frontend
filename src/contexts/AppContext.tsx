@@ -10,7 +10,10 @@ interface AppContextInterface {
     setProjectId: (projectId: string | number) => void;
     avenantId: string | number | null;
     setAvenantId: (avenantId: string | number) => void;
-
+    currentTable: string ;
+    setCurrentTable: (currentTable: string ) => void;
+    infoproduit: { idproduit: number |null , designationProduit: string|null },
+    setInfoProduit: (infoproduit: { idproduit: number |null , designationProduit: string|null }) => void;
 }
 
 interface AppProviderProps {
@@ -27,6 +30,10 @@ const AppContext  = createContext<AppContextInterface>(
         setProjectId: (projectId: string | number) => {},
         avenantId: null,
         setAvenantId: (avenantId: string | number) => {},
+        currentTable: 'produit',
+        setCurrentTable: (currentTable: string) => {},
+        infoproduit: { idproduit: null , designationProduit: null },
+        setInfoProduit: (infoproduit: { idproduit: number |null , designationProduit: string|null }) => {},
     }
 );
 
@@ -41,13 +48,19 @@ export const AppProvider:React.FC <AppProviderProps> = ({ children  }) => {
     const [projectId, setProjectId] = useState<string | number | null>(null);
     const [avenantId, setAvenantId] = useState<string | number | null>(null);
 
+    const [currentTable, setCurrentTable] = useState<string>('produit');
+    const [infoproduit, setInfoProduit] = useState<{ idproduit: number |null , designationProduit: string|null }>({ idproduit: null , designationProduit: null });
+
+
 
     return (
         <AppContext.Provider 
         value={{ currentCharge, setCurrentCharge, 
                  currentSigma, setCurrentSigma,
                  projectId, setProjectId,
-                 avenantId, setAvenantId
+                 avenantId, setAvenantId,
+                 currentTable, setCurrentTable,
+                 infoproduit, setInfoProduit
         }}>
             {children}
         </AppContext.Provider>

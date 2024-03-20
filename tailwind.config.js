@@ -68,11 +68,8 @@ module.exports = {
         'ion-bg-success': '#9394a5',
         'ion-bg-warning': '#484b6a',
         'ion-item-background': '#1e1e1e',
-
         'ion-toolbar-background': '#1f1f1f',
-
         'ion-tab-bar-background': '#1f1f1f',
-
         'ion-card-background': '#1e1e1e',
         // Feel free to add more colors as needed
       },

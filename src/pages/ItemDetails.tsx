@@ -9,6 +9,8 @@ import TableCard from '../components/TableCard';
 import useColumns from '../hooks/useColumns';
 import InfoCard from '../components/InfoCard';
 import { useAppContext } from '../contexts/AppContext';
+import { Button } from '@mui/material';
+import ButtonList from '../components/buttonList';
 
 
 type Props = {}
@@ -17,8 +19,9 @@ type Props = {}
 const ItemDetails:React.FC = () => {
 
   const { AllRowData ,displayedRowData }:any = useHistory().location.state ?? {};
-  const [currentTable, setCurrentTable] = React.useState('produit');
-  const {projectId,avenantId ,currentCharge}=useAppContext();
+  const {currentTable, setCurrentTable} = useAppContext();
+  const {projectId,avenantId ,currentCharge ,setInfoProduit}=useAppContext();
+
 
 
 
@@ -30,8 +33,15 @@ const ItemDetails:React.FC = () => {
 
   const route = useHistory();
   const handleRowClick = (row:any) => {
-    console.log(row);
-    route.push({pathname:'/details'})
+
+    const rowchildren= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => value )[0];
+    if (currentTable=='produit') setInfoProduit({idproduit:row.original?.id,designationProduit:row.original?.designation})
+    if((rowchildren as any[])?.length > 0) {
+      route.push({pathname:'/details',state:{AllRowData:row.original,displayedRowData:row._valuesCache , currentTable:currentTable,
+        tableName:"parent"
+      }})
+    
+    }
 
   }
 
@@ -74,9 +84,11 @@ const ItemDetails:React.FC = () => {
 
     <InfoCard AllRowData={AllRowData} displayedData={displayedRowData} currentInfo={"AV"} />
 
+    <ButtonList />
+
 
     <IonSelect
-    className=' w-44 mx-4 bg-ion-item-background px-2 ' 
+    className=' w-44 mx-4 dark:bg-ion-item-background shadow-md px-2 ' 
     label="Vue par:" interface="popover" 
     onIonChange={(e:any) => setCurrentTable(e.detail.value)}
     selectedText={currentTable}
@@ -86,11 +98,13 @@ const ItemDetails:React.FC = () => {
           <IonSelectOption value="tache">Tache</IonSelectOption>
         </IonSelect>
 
-<TableCard data={data} columns={columns} handleRwoClick={handleRowClick} isError={isError} isPending={isPending} title='items'  />
 
 
+<TableCard data={data} columns={columns} handleRwoClick={handleRowClick} isError={isError} isPending={isPending} 
+    title={currentTable.charAt(0).toUpperCase() + currentTable.slice(1)+"s"}
+    enableEditing={true}
+/>
     
-
       
     </IonContent>
   </IonPage>

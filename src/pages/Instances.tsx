@@ -104,7 +104,7 @@ const Instances : React.FC= () => {
            <IonSpinner className=' flex justify-center items-center ' name="crescent"></IonSpinner>
 
       ):(
-        <Table  data={data?.data as []} columns={collumns} onRowClick={handleRowClick}  />
+        <Table hideColumns={false} enableEditing={true}  data={data?.data as []} columns={collumns} onRowClick={handleRowClick}  />
       )}
       
 

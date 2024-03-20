@@ -16,20 +16,16 @@ interface TableProps {
   onRowClick: (rowData: any) => void; // Define prop for callback function
   data: any[];
   columns: MRT_ColumnDef<any>[];
+  enableEditing: boolean;
+  hideColumns:boolean;
 }
 
 
-const Table:React.FC <TableProps> = ({onRowClick ,data , columns}) => {
+const Table:React.FC <TableProps> = ({onRowClick ,data , columns , enableEditing=false ,hideColumns=false}) => {
 
 
 
-
-
-
-
-  //should be memoized or stable
-
-
+  // Define the table instance using the useMaterialReactTable hook
   const table = useMaterialReactTable({
     columns,
     data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
@@ -38,21 +34,34 @@ const Table:React.FC <TableProps> = ({onRowClick ,data , columns}) => {
     enableFullScreenToggle:false,
     initialState:{
       columnVisibility:{
-        'id':false
+        'id':false, //hide id on displayed table
+        'produitId':false,
+        'lotId':false,
+        'activiteId':false,
+        'ordre':!hideColumns,  // hides unwanted columns
+        'produit':!hideColumns,
+        'lot':!hideColumns,
+        'activite':!hideColumns,
+        'upb':!hideColumns,
       },
+    
       density:'compact',
     },
-    enableEditing:true,
+    enableEditing:enableEditing,
+    onEditingRowSave: ({ table, values  }) => {
+      //validate data
+      //save data to api
 
-  
-      
+      console.log('onEditingRowSave', values);
+
+
+      table.setEditingRow(null); //exit editing mode
+    },
+       
     muiTableBodyRowProps: ({ row ,table }) => ({
       onClick: (event) => {
 
-        console.log('clicked table ', table);
-        
           onRowClick(row); // Call the callback function with the row data
-          //NavCustomEvent.push({pathname: "/details" , state: { AllRowData: row.original , displayedRowData: row._valuesCache   } });
       },
       sx: {
         cursor: 'pointer', //you might want to change the cursor too when adding an onClick
