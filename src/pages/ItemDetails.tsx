@@ -104,6 +104,7 @@ const ItemDetails:React.FC = () => {
 <TableCard data={data} columns={columns} handleRwoClick={handleRowClick} isError={isError} isPending={isPending} 
     title={currentTable.charAt(0).toUpperCase() + currentTable.slice(1)+"s"}
     enableEditing={true}
+    enableGraph={true}
 />
     
       

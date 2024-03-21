@@ -14,10 +14,11 @@ interface InfoCardProps {
     title?:string;
     hideColumns?:boolean;
     enableEditing?:boolean;
+    enableGraph?:boolean;
 
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({  handleRwoClick=()=>{},columns,data , isError,isPending  ,enableEditing=false, title ,hideColumns=false}) => {
+const InfoCard: React.FC<InfoCardProps> = ({  handleRwoClick=()=>{},columns,data , isError,isPending  ,enableEditing=false, title ,hideColumns=false ,enableGraph=false}) => {
     return (
         <IonCard>
         <IonCardHeader>
@@ -26,7 +27,7 @@ const InfoCard: React.FC<InfoCardProps> = ({  handleRwoClick=()=>{},columns,data
         <IonCardContent>
 
           {data ?  
-            <Table enableEditing={enableEditing}  data={data?.data ? data.data : data  as []} columns={columns} onRowClick={handleRwoClick} hideColumns={hideColumns}/>
+            <Table enableEditing={enableEditing}  data={data?.data ? data.data : data  as []} columns={columns} onRowClick={handleRwoClick} hideColumns={hideColumns} enableGraph={enableGraph}/>
 
           :isPending ?<IonSpinner name="crescent"/>
           :isError ? <IonLabel color={'danger'}>Erreur</IonLabel> 

@@ -57,7 +57,6 @@ const handleClose=()=>{
   setAddAnchorEl(null);
 }
 const Navigate=(to?:string)=>{
-  console.log('table prop ', table.getRow("2",true))
 
   const tables=table.getFilteredRowModel().rows;
   const tableRows = tables.map((row) => row.original);
@@ -71,11 +70,18 @@ const Navigate=(to?:string)=>{
 
 <>
   
-      <button id='view-trigger' type="button" 
+  
+      <button id='view-trigger' type="button"  className='p-2'
 
       onClick={handleViewClick}
       >
         <BarChartIcon />
+      </button>
+
+      <button id='add-trigger' type="button"  className='p-2'
+     onClick={handleAddClick}
+      >
+      <AddIcon/>
       </button>
 
       <Menu
@@ -89,11 +95,7 @@ const Navigate=(to?:string)=>{
 
       </Menu>
 
-      <button id='add-trigger' type="button" 
-     onClick={handleAddClick}
-      >
-      <AddIcon/>
-      </button>
+     
 
       <Menu
         id="add-trigger"

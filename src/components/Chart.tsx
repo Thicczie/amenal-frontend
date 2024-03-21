@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { QueryKey, useQuery } from "@tanstack/react-query";
-import { getChartDataByAvenantIdAndTacheIds } from "../api/api";
+
+import {
+  getChartDataByAvenantIdAndTacheIds,
+  getChartDataByAvenantIdAndLots,
+  getChartDataByAvenantIdAndProduits
+} from '../api/chart_api'
 
 import {
   Radio,
@@ -12,22 +17,65 @@ import {
 import LineChart from "./charts/LineChart";
 import ChartsHeader from "./charts/ChartsHeader";
 import BarChart from "./charts/BarChart";
+import { useAppContext } from "../contexts/AppContext";
+
+
+
+interface chartProps{
+  tableRows:any[];
+}
 
 // const Line = ({ avenantId, charge, tacheIds }) => {
-const Chart = () => {
+const Chart:React.FC <chartProps> = ({tableRows}) => {
   const [isCum, setIsCum] = useState(true);
   const [isQte, setIsQte] = useState(true);
   const [isPonc, setIsPonc] = useState(true);
 
-  const avenantId = 1;
-  const charge = "null";
+  const {currentTable}=useAppContext();  
+
+
+  
+
+  //TODO : change these values with the real ones
+
+
+
+  const {currentCharge, avenantId }= useAppContext();
   const tacheIds = [1, 2, 3];
 
   //get chart data:
   const { isLoading, isError, data, error } = useQuery({
-    queryKey: ["chartData", avenantId, charge] as QueryKey,
-    queryFn: () => getChartDataByAvenantIdAndTacheIds(avenantId, charge),
+    queryKey: ["chartData", avenantId, currentCharge] as QueryKey,
+    queryFn: () =>  loadChartData(avenantId, currentCharge)
   });
+
+
+
+  const loadChartData = (avenantId: number|string|null, charge: string |null) => {
+
+
+    switch (currentTable) {
+      case'produit':
+        
+      const designationsList :string[] = tableRows.map((row: any) => row.designation);
+      return getChartDataByAvenantIdAndProduits(avenantId, charge , designationsList);
+      case 'lot':
+        const lotList:string [] = tableRows.map((row: any) => row.lot);
+      return getChartDataByAvenantIdAndLots(avenantId,charge,lotList)
+      case 'tache':
+
+      const tacheIds:number[]= tableRows.map((row: any) => row.id);
+      return getChartDataByAvenantIdAndTacheIds(avenantId,charge,tacheIds)
+
+      default : 
+      break ;
+    }
+
+
+  }
+
+
+
 
   if (!data || isLoading) return <div>Loading...</div>;
 
@@ -74,7 +122,6 @@ const Chart = () => {
       lineChartData[1][index],
     ]);
   });
-  console.log(mergedLineChartData);
 
   const CurChart = () => {
     if (isCum) return <LineChart data={mergedLineChartData} />;
@@ -82,15 +129,15 @@ const Chart = () => {
   };
 
   return (
-    <div className="m-4 md:m-10 mt-24 p-10 bg-white dark:bg-secondary-dark-bg rounded-3xl">
+    <div className="  p-10 bg-white dark:bg-ion-dark rounded-3xl">
       <ChartsHeader category="Line" title="Inflation Rate" />
       <div className="w-full">
         <CurChart />
       </div>
-      <div className="w-full mt-10">
+      <div className="w-full mt-10 flex flex-row flex-wrap ">
         <div className="radiobutton-control">
           <FormControl component="fieldset">
-            <FormLabel component="legend">Cumulatif/Journaliere</FormLabel>
+            
             <RadioGroup
               aria-label="Cumulatif/Journaliere"
               name="isCum"
@@ -113,7 +160,7 @@ const Chart = () => {
 
         <div className="radiobutton-control">
           <FormControl component="fieldset">
-            <FormLabel component="legend">Ponctuelle/Lisse</FormLabel>
+            
             <RadioGroup
               aria-label="Ponctuelle/Lisse"
               name="isPonc"
@@ -136,7 +183,7 @@ const Chart = () => {
 
         <div className="radiobutton-control">
           <FormControl component="fieldset">
-            <FormLabel component="legend">Qte/Mantant</FormLabel>
+          
             <RadioGroup
               aria-label="Qte/Mantant"
               name="isQte"

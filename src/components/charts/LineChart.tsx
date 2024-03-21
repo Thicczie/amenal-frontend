@@ -18,6 +18,7 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
       height="400px"
       data={data}
       options={options}
+      legendToggle
     />
   );
 };

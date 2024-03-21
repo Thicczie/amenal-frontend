@@ -5,10 +5,12 @@ interface BarChartProps {
   data: any;
 }
 const options = {
-  //   chart: {
-  //     title: "Company Performance",
-  //     subtitle: "Sales, Expenses, and Profit: 2014-2017",
-  //   },
+   
+    bars: "vertical", // Required for Material Bar Charts.
+backgroundColor:"#f4d774",
+
+
+
 };
 
 const BarChart: React.FC<BarChartProps> = ({ data }) => {
@@ -18,6 +20,7 @@ const BarChart: React.FC<BarChartProps> = ({ data }) => {
       width="100%"
       height="400px"
       data={data}
+      legendToggle={false}
       options={options}
     />
   );

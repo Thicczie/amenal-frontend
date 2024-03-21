@@ -17,12 +17,30 @@ import {
     } from '@ionic/react'
 import { MRT_TableInstance } from 'material-react-table';
 import { useHistory } from 'react-router';
+import Chart from '../components/Chart';
+import { useAppContext } from '../contexts/AppContext';
 
 
 
 const Graph:React.FC = () => {
 
 const { tableRows }:any = useHistory().location.state ?? {};
+
+
+
+//console.log('tablerows designations ' , tableRows?.map((row:any)=>row?.lot ? row.lot : null));
+
+console.log('tablrows ',tableRows);
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -38,8 +56,8 @@ const { tableRows }:any = useHistory().location.state ?? {};
     </IonToolbar>
   </IonHeader>
   <IonContent class="ion-padding">
-    <h1>Page Two</h1>
 
+      <Chart tableRows={tableRows} />
   </IonContent>
   </IonPage>
   )
