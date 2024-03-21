@@ -46,6 +46,7 @@ import ItemDetails from './pages/ItemDetails';
 import Details from './pages/Details';
 import Details2 from './pages/Details2';
 import { AppProvider } from './contexts/AppContext';
+import Graph from './pages/Graph';
 
 setupIonicReact();
 const queryClient= new QueryClient();
@@ -101,6 +102,7 @@ const AppContent: React.FC = () => {
       <Route exact path='/iteminfo/iteminfodetail' component={ItemDetails}/>
       <Route exact path='/details' component={Details}/>
       <Route exact path='/details2' component={Details2}/>
+      <Route exact path='/graph' component={Graph}/>
 
 
   

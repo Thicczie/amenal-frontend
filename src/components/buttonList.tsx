@@ -16,50 +16,99 @@ import{
     IonNav
     } from '@ionic/react'
 import Graph from '../pages/Graph'
+import { useHistory } from 'react-router';
+
+import AddIcon from '@mui/icons-material/Add';
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { MRT_TableInstance } from 'material-react-table';
 
-const buttonList :React.FC = () => {
-  const navRef=React.useRef<HTMLIonNavElement>(null);
-  const Navigate=()=>{
-       navRef.current?.push('/graph');
-    }
+
+interface buttonListProps {
+  table: MRT_TableInstance<any>;
+}
+
+
+const buttonList :React.FC<buttonListProps> = ({table}) => {
+
+  const route = useHistory();
+  const popoverRef=React.useRef<HTMLIonPopoverElement>(null);
+
+  const [viewAnchorEl, setViewAnchorEl] = React.useState<null | HTMLElement>(null);
+const [addAnchorEl, setAddAnchorEl] = React.useState<null | HTMLElement>(null);
+
+const viewOpen=Boolean(viewAnchorEl);
+const addOpen=Boolean(addAnchorEl);
+
+
+const handleViewClick = (event:any) => {
+  setViewAnchorEl(event?.currentTarget);
+};
+
+const handleAddClick = (event:any) => {
+  setAddAnchorEl(event?.currentTarget);
+};
+
+const handleClose=()=>{
+  setViewAnchorEl(null);
+  setAddAnchorEl(null);
+}
+const Navigate=(to?:string)=>{
+  console.log('table prop ', table.getRow("2",true))
+
+  const tables=table.getFilteredRowModel().rows;
+  const tableRows = tables.map((row) => row.original);
+  handleClose();
+  if(to) route.push({ pathname: "/" + to, state: { tableRows:tableRows} });
+  else return;
+  
+  // navRef.current?.push(Graph);
+}
   return (
 
 <>
-    <button id='export-trigger' type="button" className=" dark:bg-ion-dark  text-white  bg-ion-primary hover:bg-ion-primary-tint dark:hover:bg-ion-dark-tint focus:bg-ion-primary-shade dark:focus:bg-ion-dark-shade font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Export</button>
-    <IonPopover trigger="export-trigger" triggerAction="click">
-        <IonContent>
-        <IonList>
-            <IonItem>Pdf</IonItem>
-            <IonItem>Excel</IonItem>
-        </IonList>
-        </IonContent>
-      </IonPopover>
+  
+      <button id='view-trigger' type="button" 
 
+      onClick={handleViewClick}
+      >
+        <BarChartIcon />
+      </button>
 
-      <button id='view-trigger' type="button" className=" dark:bg-ion-dark  text-white  bg-ion-primary hover:bg-ion-primary-tint dark:hover:bg-ion-dark-tint focus:bg-ion-primary-shade dark:focus:bg-ion-dark-shade font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Graph</button>
-    <IonPopover trigger="view-trigger" triggerAction="click">
-        <IonContent>
-        <IonList>
-            <IonItem>Chart</IonItem>
-            <IonItem>Gantt</IonItem>
-        </IonList>
-        </IonContent>
-      </IonPopover><button id='add-trigger' type="button" className=" dark:bg-ion-dark  text-white  bg-ion-primary hover:bg-ion-primary-tint dark:hover:bg-ion-dark-tint focus:bg-ion-primary-shade dark:focus:bg-ion-dark-shade font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Add</button>
-    <IonPopover trigger="add-trigger" triggerAction="click">
-        <IonContent>
-        <IonList>
-            <IonItem>
-                <IonNav ref={navRef} >
-                    <IonButton onClick={Navigate} >Observation</IonButton>
-                </IonNav>
-            </IonItem>
-            <IonItem>Document</IonItem>
-            <IonItem>Taf</IonItem>
-        </IonList>
-        </IonContent>
-      </IonPopover>
+      <Menu
+        id="view-trigger"
+        anchorEl={viewAnchorEl}
+        open={viewOpen}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={()=>Navigate('graph')}>Graph</MenuItem>
+        <MenuItem onClick={()=>Navigate()}>Gantt</MenuItem>
+
+      </Menu>
+
+      <button id='add-trigger' type="button" 
+     onClick={handleAddClick}
+      >
+      <AddIcon/>
+      </button>
+
+      <Menu
+        id="add-trigger"
+        anchorEl={addAnchorEl}
+        open={addOpen}
+        onClose={handleClose}
+   
+      >
+        <MenuItem onClick={()=>Navigate()}>Observationss</MenuItem>
+        <MenuItem onClick={()=>Navigate()}>Document</MenuItem>
+        <MenuItem onClick={()=>Navigate()}>Taf</MenuItem>
+      </Menu>
+      
+      
+  
 </>
   )
 }

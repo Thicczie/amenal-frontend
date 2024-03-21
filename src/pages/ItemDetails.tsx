@@ -84,9 +84,7 @@ const ItemDetails:React.FC = () => {
 
     <InfoCard AllRowData={AllRowData} displayedData={displayedRowData} currentInfo={"AV"} />
 
-    <ButtonList />
-
-
+    <div className=' flex-row flex items-center align-middle '>
     <IonSelect
     className=' w-44 mx-4 dark:bg-ion-item-background shadow-md px-2 ' 
     label="Vue par:" interface="popover" 
@@ -98,6 +96,9 @@ const ItemDetails:React.FC = () => {
           <IonSelectOption value="tache">Tache</IonSelectOption>
         </IonSelect>
 
+    </div>
+
+  
 
 
 <TableCard data={data} columns={columns} handleRwoClick={handleRowClick} isError={isError} isPending={isPending} 

@@ -6,11 +6,8 @@ import {
 } from 'material-react-table';
 import { IonButton, IonNavLink, LocationHistory, NavCustomEvent } from '@ionic/react';
 import Details from '../pages/Details';
-
-
-
-
-
+import { Button } from '@mui/material';
+import ButtonList from './buttonList';
 
 interface TableProps {
   onRowClick: (rowData: any) => void; // Define prop for callback function
@@ -20,10 +17,7 @@ interface TableProps {
   hideColumns:boolean;
 }
 
-
 const Table:React.FC <TableProps> = ({onRowClick ,data , columns , enableEditing=false ,hideColumns=false}) => {
-
-
 
   // Define the table instance using the useMaterialReactTable hook
   const table = useMaterialReactTable({
@@ -32,7 +26,9 @@ const Table:React.FC <TableProps> = ({onRowClick ,data , columns , enableEditing
     enableColumnResizing: true,
     enablePagination:true,
     enableFullScreenToggle:false,
-    initialState:{
+    enableStickyHeader:true,
+    
+    initialState:{   
       columnVisibility:{
         'id':false, //hide id on displayed table
         'produitId':false,
@@ -48,6 +44,7 @@ const Table:React.FC <TableProps> = ({onRowClick ,data , columns , enableEditing
       density:'compact',
     },
     enableEditing:enableEditing,
+
     onEditingRowSave: ({ table, values  }) => {
       //validate data
       //save data to api
@@ -57,10 +54,15 @@ const Table:React.FC <TableProps> = ({onRowClick ,data , columns , enableEditing
 
       table.setEditingRow(null); //exit editing mode
     },
-       
+    renderTopToolbarCustomActions: ({ table }) => {
+
+  
+      
+      return  <ButtonList table={table}/>;
+    },
+    
     muiTableBodyRowProps: ({ row ,table }) => ({
       onClick: (event) => {
-
           onRowClick(row); // Call the callback function with the row data
       },
       sx: {

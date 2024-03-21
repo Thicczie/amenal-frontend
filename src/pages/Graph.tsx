@@ -15,9 +15,18 @@ import {
     IonButton,
     IonBackButton
     } from '@ionic/react'
+import { MRT_TableInstance } from 'material-react-table';
+import { useHistory } from 'react-router';
+
 
 
 const Graph:React.FC = () => {
+
+const { tableRows }:any = useHistory().location.state ?? {};
+
+
+
+  
   return (
     <IonPage>
     <IonHeader>
