@@ -2,11 +2,14 @@ import React from 'react';
 import { IonCard, IonCardHeader, IonCardContent, IonList, IonGrid, IonRow, IonCol, IonLabel, IonLoading, IonCardTitle, IonSpinner } from '@ionic/react';
 import Table from './Table';
 import { MRT_ColumnDef } from 'material-react-table';
+import { useAppContext } from '../contexts/AppContext';
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 
 interface InfoCardProps {
 
    
     handleRwoClick?: (row:any) => void;
+    onRowContextMenu?: (rowData: any | null) => void;
     columns:MRT_ColumnDef<any>[];
     data:any;
     isPending:boolean;
@@ -15,23 +18,60 @@ interface InfoCardProps {
     hideColumns?:boolean;
     enableEditing?:boolean;
     enableGraph?:boolean;
+    enableSeeAll?:boolean;
+    enableFilterByCharge?:boolean;
+    showFilteredBy?:boolean;
+    HeaderContent?:JSX.Element;
 
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({  handleRwoClick=()=>{},columns,data , isError,isPending  ,enableEditing=false, title ,hideColumns=false ,enableGraph=false}) => {
-    return (
+const InfoCard: React.FC<InfoCardProps> = ({  
+  handleRwoClick=()=>{},
+   onRowContextMenu ,
+    columns,data , isError,isPending  ,
+    enableEditing=false,
+    title ,
+    hideColumns=false ,
+    enableGraph=false ,enableSeeAll , enableFilterByCharge,showFilteredBy=false,
+    HeaderContent
+  }) => {
+  const{ currentCharge ,setCurrentCharge}=useAppContext();  
+  return (
         <IonCard>
         <IonCardHeader>
-          <IonCardTitle>{title} </IonCardTitle>          
+          <IonCardTitle>
+            <div className='flex justify-between'>
+
+            {title}   
+          
+          {HeaderContent}
+            </div>
+         
+
+
+          </IonCardTitle>    
+         {showFilteredBy && currentCharge &&
+           <div className='flex justify-end' onClick={()=>setCurrentCharge(null)} >{currentCharge}   <FilterAltOffIcon/> </div>
+          
+         } 
         </IonCardHeader>
-        <IonCardContent>
+        <IonCardContent className='p-1'>
 
           {data ?  
-            <Table enableEditing={enableEditing}  data={data?.data ? data.data : data  as []} columns={columns} onRowClick={handleRwoClick} hideColumns={hideColumns} enableGraph={enableGraph}/>
+            <Table enableEditing={enableEditing} 
+             data={data?.data ? data.data : data  as []}
+              columns={columns}
+               onRowClick={handleRwoClick}
+               onRowContextMenu={onRowContextMenu}
+                hideColumns={hideColumns}
+                 enableGraph={enableGraph}
+                 enableSeeAll={enableSeeAll}
+                  enableFilterByCharge={enableFilterByCharge}
+                 />
 
           :isPending ?<IonSpinner name="crescent"/>
           :isError ? <IonLabel color={'danger'}>Erreur</IonLabel> 
-          : <p>loading...</p>}
+          : <p></p>}
           
         </IonCardContent>
       </IonCard>

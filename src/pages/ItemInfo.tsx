@@ -17,6 +17,7 @@ import useColumns from '../hooks/useColumns';
 import InfoCard from '../components/InfoCard';
 import TableCard from '../components/TableCard';
 import { useAppContext } from '../contexts/AppContext';
+import { BdgLayout, BdgTitleLayout } from '../constants/infoLayout';
 
 
 
@@ -61,7 +62,7 @@ const ItemInfo :React.FC = () => {
   </IonHeader>
   <IonContent>
 
-   <InfoCard AllRowData={AllRowData}  displayedData={displayedRowData} currentInfo={"BDG"}/>
+   <InfoCard  TitleLayout={BdgTitleLayout} Layout={BdgLayout} currentInfo={"BDG"}/>
    <TableCard title='Avenants'   data={data} isError={isError} isPending={isPending} columns={columns} 
    handleRwoClick={handleRowClick} 
    enableEditing={true}

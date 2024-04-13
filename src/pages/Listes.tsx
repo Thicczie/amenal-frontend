@@ -24,7 +24,8 @@ const Listes: React.FC = () => {
         </IonToolbar>
       </IonHeader>  </IonHeader>
   <IonContent>
-    <Table onRowClick={()=>{}}/>
+   
+    
   </IonContent>
   </IonPage>;
 };

@@ -1,22 +1,22 @@
 import React, { useRef } from 'react';
-import { IonCard, IonCardHeader, IonCardContent, IonList, IonGrid, IonRow, IonCol, IonLabel, IonLoading, IonSpinner, IonNav } from '@ionic/react';
-import { AvLayout,BdgLayout  , AvTitleLayout,BdgTitleLayout} from '../constants/infoLayout';
+import { IonCard, IonCardHeader, IonCardContent, IonList, IonGrid, IonRow, IonCol, IonLabel, IonLoading, IonSpinner, IonNav, IonItem, IonAccordionGroup, IonAccordion } from '@ionic/react';
+import { AvLayout,BdgLayout  , AvTitleLayout,BdgTitleLayout, TLayout, ILayout} from '../constants/infoLayout';
 import { getProjectById , getAvenantById } from '../api/api';
 import { useQuery } from '@tanstack/react-query';
 import Details from '../pages/Details';
 import { useAppContext } from '../contexts/AppContext';
 
 interface InfoCardProps {
-    AllRowData: any;
-    displayedData: any;
     currentInfo: string;
+    TitleLayout:TLayout;
+    Layout :ILayout[];
 
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({ AllRowData, displayedData , currentInfo }) => {
-  const Layout = currentInfo === "AV" ? AvLayout : BdgLayout; 
-  const TitleLayout = currentInfo === "AV" ? AvTitleLayout : BdgTitleLayout;
+const InfoCard: React.FC<InfoCardProps> = ({ currentInfo , Layout , TitleLayout }) => {
 
+  //const Layout = currentInfo === "AV" ? AvLayout : BdgLayout; 
+  // const TitleLayout = currentInfo === "AV" ? AvTitleLayout : BdgTitleLayout;
 const {projectId,avenantId}=useAppContext();
  
 
@@ -29,12 +29,12 @@ const {projectId,avenantId}=useAppContext();
         return getAvenantById(avenantId);
    
       default:
-        throw new Error('Invalid table');
+        return null;
     }
   };
 
   const { isPending, isError, data ,status } = useQuery({
-    queryKey: ['info',currentInfo],
+    queryKey: ['info',currentInfo , avenantId , projectId],
     queryFn: fetchInfo
   }) 
 
@@ -42,7 +42,11 @@ const {projectId,avenantId}=useAppContext();
 
     return (
        <IonCard>
-        <IonCardHeader >
+
+
+        <IonAccordionGroup>
+          <IonAccordion>
+          <IonCardHeader slot='header' >
             <h1 className='text-center'>
                 
 
@@ -58,12 +62,14 @@ const {projectId,avenantId}=useAppContext();
                               </h1>
                       
         </IonCardHeader>
-        <IonCardContent >
+        <IonCardContent slot='content' >
             <IonList>
             {data ? (
-  <IonGrid>
+  <IonGrid className=' dark:bg-ion-card-background '>
+
     {Layout.map(({ key, label }) => (
       <IonRow key={key}>
+      
         <IonCol>
           <IonLabel>{label}</IonLabel>
         </IonCol>
@@ -77,6 +83,7 @@ const {projectId,avenantId}=useAppContext();
 
       </IonRow>
     ))}
+
   </IonGrid>
 ) : (
   <IonLabel color={'danger'}>Erreur</IonLabel>
@@ -87,6 +94,13 @@ const {projectId,avenantId}=useAppContext();
 
 
         </IonCardContent>
+
+
+
+          </IonAccordion>
+        </IonAccordionGroup>
+ 
+    
     
         </IonCard>
     );

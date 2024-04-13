@@ -1,12 +1,12 @@
 
-interface ILayout {
+ interface ILayout {
     key :string;
     label:string;
 
 }
 
 
-interface TLayout {
+ interface TLayout {
     ref :string;
     date:string;
 
@@ -67,6 +67,70 @@ const BdgLayout :ILayout[] =[
 ];
 
 
+
+
+const BsnLayout :ILayout[] =[
+    {
+        key : 'datePrevu',
+        label: 'DATE PREVUE BESOIN',
+
+    },
+    {
+        key : "charge.designation",
+        label: 'ARTICLE',
+
+    },
+    {
+        key : 'qte',
+        label: 'QUANTITE',
+
+    },
+    {
+        key : 'prixUnitaire',
+        label: 'PRIX U. HT',
+
+    },
+    {
+        key : 'mntHt',
+        label: 'MONTANT HT',
+
+    },
+    {
+        key : 'mntTva',
+        label: 'MONTANT TVA',
+
+    },
+    {
+        key : 'mntTtc',
+        label: 'MONTANT TTC',
+
+    },
+    {
+        key : 'tache.project.project',
+        label: 'PROJET',
+
+    },
+    {
+        key : 'tache.lot.lot',
+        label: 'LOT',
+
+    },
+    {
+        key : 'tache',
+        label: 'TACHE',
+
+    },
+]
+
+
+const BsnTitleLayout :TLayout ={
+    date : 'datePrevu',
+    ref : 'charge.designation',
+
+}
+
+
+
 const BdgTitleLayout :TLayout ={
     
 
@@ -94,4 +158,5 @@ const  LotLayout :ILayout[] =[];
 const TacheLayout:ILayout[] =[];
 
 
-export {AvLayout, BdgLayout , AvTitleLayout , BdgTitleLayout} 
+export {AvLayout, BdgLayout , AvTitleLayout , BdgTitleLayout , BsnLayout , BsnTitleLayout }
+export type {ILayout,TLayout}

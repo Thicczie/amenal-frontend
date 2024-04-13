@@ -234,3 +234,112 @@ export const getFilteredDetailDelaiTableByTacheAndAvenant = (tacheId) => {
 export const getFilteredDetailDelaiTableByActivitePrincipaleAndAvenant = (tacheId) => {
     return apiClient.get(`/detailDelaiTable/avenant/activitePrincipale/${tacheId}`);
 };
+
+
+
+
+
+
+
+
+//save Details Attente
+export const saveAllDetailProduitAttentes = async (detailProduitAttentes) => {
+    try {
+        const response = await apiClient.post(`/detailProduitAttentes/addAll`, detailProduitAttentes);
+        return response;
+    } catch (error) {
+        console.error('Error saving DetailProduitAttentes:', error);
+        throw error;
+    }
+};
+
+export const saveAllDetailChargeAttentes = async (detailChargeAttentes) => {
+    try {
+        const response = await apiClient.post(`/detailChargeAttentes/addAll`, detailChargeAttentes);
+        return response;
+    } catch (error) {
+        console.error('Error saving DetailChargeAttentes:', error);
+        throw error;
+    }
+};
+
+export const saveAllDetailDelaiAttentes = async (detailDelaiAttentes) => {
+    try {
+        const response = await apiClient.post(`/detailDelaiAttentes/addAll`, detailDelaiAttentes);
+        return response;
+    } catch (error) {
+        console.error('Error saving DetailDelaiAttentes:', error);
+        throw error;
+    }
+};
+
+export const saveAllDetailQualiteAttentes = async (detailQualiteAttentes) => {
+    try {
+        const response = await apiClient.post(`/detailQualiteAttentes/addAll`, detailQualiteAttentes);
+        return response;
+    } catch (error) {
+        console.error('Error saving DetailQualiteAttentes:', error);
+        throw error;
+    }
+};
+
+// get DetailsAttente By avenant Id:
+export const getDetailChargeAttentesByAvenantId = (avenantId) => {
+    return apiClient.get(`/detailChargeAttentes/avenant/${avenantId}`);
+};
+
+
+//get  previous uploaded files with errors  , after valider can upload
+export const getDetailProduitAttentesByAvenantId = (avenantId) => {
+    return apiClient.get(`/detailProduitAttentes/avenant/${avenantId}`);
+};
+
+export const getDetailDelaiAttentesByAvenantId = (avenantId) => {
+    return apiClient.get(`/detailDelaiAttentes/avenant/${avenantId}`);
+};
+
+export const getDetailQualiteAttentesByAvenantId = (avenantId) => {
+    return apiClient.get(`/detailQualiteAttentes/avenant/${avenantId}`);
+};
+
+//valider all detail attentes of an avenant id :
+
+export const validerDetailProduitAttentesByAvenantId = async (avenantId) => {
+    try {
+        const response = await apiClient.post(`/detailProduitAttentes/valider/${avenantId}`, {});
+        return response;
+    } catch (error) {
+        console.error('Error saving DetailProduitAttentes:', error);
+        throw error;
+    }
+};
+
+export const validerDetailChargeAttentesByAvenantId = async (avenantId) => {
+    try {
+        const response = await apiClient.post(`/detailChargeAttentes/valider/${avenantId}`, {});
+        return response;
+    } catch (error) {
+        console.error('Error saving DetailChargeAttentes:', error);
+        throw error;
+    }
+};
+
+export const validerDetailDelaiAttentesByAvenantId = async (avenantId) => {
+    try {
+        const response = await apiClient.post(`/detailDelaiAttentes/valider/${avenantId}`, {});
+        return response;
+    } catch (error) {
+        console.error('Error saving DetailDelaiAttentes:', error);
+        throw error;
+    }
+};
+
+export const validerDetailQualiteAttentesByAvenantId = async (avenantId) => {
+    try {
+        const response = await apiClient.post(`/detailQualiteAttentes/valider/${avenantId}`);
+        return response;
+    } catch (error) {
+        console.error('Error saving DetailQualiteAttentes:', error);
+        throw error;
+    }
+};

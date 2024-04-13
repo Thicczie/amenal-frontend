@@ -1,19 +1,11 @@
 import React from "react";
 
 import {
-  IonButtons,
-  IonButton,
   IonToolbar,
   IonHeader,
   IonTitle,
-  IonMenuButton,
   IonContent,
   IonMenu,
-  IonSplitPane,
-  IonList,
-  IonListHeader,
-  IonNote,
-  IonMenuToggle,
   IonItem,
   IonLabel,
   IonAccordion, IonAccordionGroup,
@@ -41,7 +33,7 @@ const SideMenu:React.FC = () => {
 
   const items:AppPage[] = [
     {
-      title: "comptes",
+      title: "Comptes",
       content: [
         {
           label: "budget",
@@ -55,16 +47,52 @@ const SideMenu:React.FC = () => {
     },
 
     {
-      title: "achat",
+      title: "Achat",
       content: [
         {
-          label: "commande",
-          path: "/commande",
+          label:"BSN",
+          path:"/achat/bsn",
+          
         },
         {
-          label: "fournisseur",
-          path: "/fournisseur",
+          label:"DDF",
+          path:"/achat/ddf",
+          
+        }, {
+          label:"DVF",
+          path:"/dvf",
+          
+        }, {
+          label:"RCF",
+          path:"/achat/rcf",
+          
+        }, {
+          label:"FCF",
+          path:"/achat/fcf",
+          
+        }, {
+          label:"PMF",
+          path:"/achat/pmf",
+          
+        }, {
+          label:"FRS",
+          path:"/achat/frs",
+          
+        }, {
+          label:"CHG",
+          path:"/achat/chg",
+          
         },
+        {
+          label:"EXPLOITATION",
+          path:"/achat/exploitation",
+          
+        }, {
+          label:"CMT",
+          path:"/achat/cmt",
+          
+        },
+     
       ],
     },
   ];

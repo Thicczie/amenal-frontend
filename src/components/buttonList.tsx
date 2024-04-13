@@ -78,11 +78,11 @@ const Navigate=(to?:string)=>{
         <BarChartIcon />
       </button>
 
-      <button id='add-trigger' type="button"  className='p-2'
+      {/* <button id='add-trigger' type="button"  className='p-2'
      onClick={handleAddClick}
       >
       <AddIcon/>
-      </button>
+      </button> */}
 
       <Menu
         id="view-trigger"
@@ -97,7 +97,7 @@ const Navigate=(to?:string)=>{
 
      
 
-      <Menu
+      {/* <Menu
         id="add-trigger"
         anchorEl={addAnchorEl}
         open={addOpen}
@@ -107,7 +107,7 @@ const Navigate=(to?:string)=>{
         <MenuItem onClick={()=>Navigate()}>Observationss</MenuItem>
         <MenuItem onClick={()=>Navigate()}>Document</MenuItem>
         <MenuItem onClick={()=>Navigate()}>Taf</MenuItem>
-      </Menu>
+      </Menu> */}
       
       
   

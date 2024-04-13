@@ -17,13 +17,13 @@ const Details:React.FC = () => {
 
 
 const route = useHistory();
-const {currentTable , infoproduit , avenantId} = useAppContext();
+const {currentTable , infoproduit , setInfoProduit , avenantId} = useAppContext();
 const { AllRowData ,displayedRowData , tableName="" }:any = useHistory().location.state ?? {};
-const parentId=AllRowData?.id; // id of the parent row produit or lot or tache or lot de produit
+const [rowId,setRowId]=React.useState<string|number|null>(null);
+
 
 const [currentDetailTable ,setCurrentDetailTable]=React.useState<string>("produits");
-
-
+const cardTitle:string = 'Détails'+' '+ currentDetailTable.charAt(0).toUpperCase() + currentDetailTable.slice(1);
 
 
 
@@ -39,39 +39,72 @@ const columns = useColumns(filteredvalueschildren as any[]);
 // dumb hack to switch between details and details2 enables animation transition
 const handleRowClick = (row:any) => {
 
-    const rowchildren= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => value )[0];
-    if((rowchildren as any[])?.length > 0) {
-      const tableName :string | null= AllRowData? Object.entries(AllRowData).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => key )[0]:"produit";
-      const newPathname = route.location.pathname === '/details' ? '/details2' : '/details';
-      route.push({ pathname: newPathname, state:{AllRowData:row.original,displayedRowData:row._valuesCache , tableName:tableName}});
+
+
+    // const rowchildren= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => value )[0];
+    // if((rowchildren as any[])?.length > 0) {
+    //   const tableName :string | null= AllRowData? Object.entries(AllRowData).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => key )[0]:"produit";
+    //   const newPathname = route.location.pathname === '/details' ? '/details2' : '/details';
+    //   route.push({ pathname: newPathname, state:{AllRowData:row.original,displayedRowData:row._valuesCache , tableName:tableName}});
     
-    }
+    // }
+
+    // if (currentTable=='produit') setInfoProduit({idproduit:row.original?.id,designationProduit:row.original?.designation});
+     setRowId(row.original?.id);
+
 }
 
+const handleContextMenuClick = (row:any) => {
+
+
+     
+  const rowchildren= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => value )[0];
+    if (currentTable=='produit') setInfoProduit({idproduit:row.original?.id,designationProduit:row.original?.designation})
+    if((rowchildren as any[])?.length > 0) {
+
+      const tableName= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value))[0][0];
+      const newPathname = route.location.pathname === '/details' ? '/details2' : '/details';
+      route.push({ pathname: newPathname, state:{AllRowData:row.original,displayedRowData:row._valuesCache , tableName:tableName}});
+
+}
+}
+
+
+
 const  detailsproduits = useQuery({
-  queryKey: ['detailsproduits',currentTable,tableName],
-  queryFn: ()=> loadProduits(currentTable,tableName),
+  queryKey: ['detailsproduits',currentTable , rowId , tableName],
+  queryFn: ()=> loadProduits(currentTable ,tableName ),
+  enabled:currentTable=="produit" ? !!(infoproduit.idproduit && rowId) : !!rowId
 });
 
 
 const  detailscharges = useQuery({
-  queryKey: ['detailscharges' , currentTable , tableName],
+  queryKey: ['detailscharges' , currentTable ,rowId],
   queryFn: ()=> loadCharges(currentTable,tableName),
+  enabled:currentTable=="produit" ? !!(infoproduit.idproduit && rowId) : !!rowId
+
   
 });
 
 
 const  detailsdelais = useQuery({
-  queryKey: ['detailsdelais',currentTable,tableName],
-  queryFn: ()=> loadDelais(currentTable,tableName)
+  queryKey: ['detailsdelais',currentTable,rowId],
+  queryFn: ()=> loadDelais(currentTable,tableName),
+  enabled:currentTable=="produit" ? !!(infoproduit.idproduit && rowId) : !!rowId
+
 });
 
 const  detailsqualites = useQuery({
-  queryKey: ['detailsqualites',currentTable,tableName],
-  queryFn: ()=> loadQualites(currentTable,tableName)
+  queryKey: ['detailsqualites',currentTable,rowId],
+  queryFn: ()=> loadQualites(currentTable,tableName),
+  enabled:currentTable=="produit" ? !!(infoproduit.idproduit && rowId) : !!rowId
+
 });
 
-
+//reset selected row
+useEffect(() => {
+  setRowId(null);
+}, [currentTable  ,tableName])
 
 
 
@@ -96,10 +129,10 @@ const loadCharges = ( currentTable:string|null ,tableName:string ="none" ) => {
       switch (tableName) {
          
           case "lotsDeProduit":
-          return  getFilteredDetailChargeTableByLotAndProduitAndAvenant(parentId , infoproduit.idproduit)
+          return  getFilteredDetailChargeTableByLotAndProduitAndAvenant(rowId , infoproduit.idproduit)
             
           case "activite":
-          return   getFilteredDetailChargeTableByTacheAndAvenant(parentId)
+          return   getFilteredDetailChargeTableByTacheAndAvenant(rowId)
              
           default:          
         return  getFilteredDetailChargeTableByProduitAndAvenant(infoproduit.idproduit,avenantId)
@@ -109,14 +142,14 @@ const loadCharges = ( currentTable:string|null ,tableName:string ="none" ) => {
   } else if (currentTable === "lot") {
       switch (tableName) {
           case "activite":
-            return getFilteredDetailChargeTableByTacheAndAvenant(parentId)
+            return getFilteredDetailChargeTableByTacheAndAvenant(rowId)
           
           default:
-           return  getFilteredDetailChargeTableByLotAndAvenant(parentId,avenantId)
+           return  getFilteredDetailChargeTableByLotAndAvenant(rowId,avenantId)
              
       }
   } else if (currentTable === "tache") {
-       return  getFilteredDetailChargeTableByTacheAndAvenant(parentId)
+       return  getFilteredDetailChargeTableByTacheAndAvenant(rowId)
 
   }
 }
@@ -128,10 +161,10 @@ const loadProduits = ( currentTable:string|null ,tableName:string ="none" ) => {
       switch (tableName) {
          
           case "lotsDeProduit":
-          return  getFilteredDetailProduitTableByLotAndProduitAndAvenant(parentId , infoproduit.idproduit)
+          return  getFilteredDetailProduitTableByLotAndProduitAndAvenant(rowId , infoproduit.idproduit)
             
           case "activite":
-          return   getFilteredDetailProduitTableByTacheAndAvenant(parentId)
+          return   getFilteredDetailProduitTableByTacheAndAvenant(rowId)
              
           default:          
         return  getFilteredDetailProduitTableByProduitAndAvenant(infoproduit.idproduit,avenantId)
@@ -141,14 +174,14 @@ const loadProduits = ( currentTable:string|null ,tableName:string ="none" ) => {
   } else if (currentTable === "lot") {
       switch (tableName) {
           case "activite":
-            return getFilteredDetailProduitTableByTacheAndAvenant(parentId)
+            return getFilteredDetailProduitTableByTacheAndAvenant(rowId)
           
           default:
-           return  getFilteredDetailProduitTableByLotAndAvenant(parentId,avenantId)
+           return  getFilteredDetailProduitTableByLotAndAvenant(rowId,avenantId)
              
       }
   } else if (currentTable === "tache") {
-       return  getFilteredDetailProduitTableByTacheAndAvenant(parentId)
+       return  getFilteredDetailProduitTableByTacheAndAvenant(rowId)
 
   }
 }
@@ -160,9 +193,9 @@ const loadQualites = ( currentTable:string|null ,tableName:string ="none" ) => {
       switch (tableName) {
          
           case "lotsDeProduit":
-          return  getFilteredDetailQualiteTableByLotAndProduitAndAvenant(parentId , infoproduit.idproduit)
+          return  getFilteredDetailQualiteTableByLotAndProduitAndAvenant(rowId , infoproduit.idproduit)
           case "activite":
-          return   getFilteredDetailQualiteTableByTacheAndAvenant(parentId)
+          return   getFilteredDetailQualiteTableByTacheAndAvenant(rowId)
              
           default:          
         return  getFilteredDetailQualiteTableByProduitAndAvenant(infoproduit.idproduit,avenantId)
@@ -172,14 +205,14 @@ const loadQualites = ( currentTable:string|null ,tableName:string ="none" ) => {
   } else if (currentTable === "lot") {
       switch (tableName) {
           case "activite":
-            return getFilteredDetailQualiteTableByTacheAndAvenant(parentId)
+            return getFilteredDetailQualiteTableByTacheAndAvenant(rowId)
           
           default:
-           return  getFilteredDetailQualiteTableByLotAndAvenant(parentId,avenantId)
+           return  getFilteredDetailQualiteTableByLotAndAvenant(rowId,avenantId)
              
       }
   } else if (currentTable === "tache") {
-       return  getFilteredDetailQualiteTableByTacheAndAvenant(parentId)
+       return  getFilteredDetailQualiteTableByTacheAndAvenant(rowId)
 
   }
 }
@@ -191,9 +224,9 @@ const loadDelais = ( currentTable:string|null ,tableName:string ="none" ) => {
       switch (tableName) {
          
           case "lotsDeProduit":
-          return  getFilteredDetailDelaiTableByLotAndProduitAndAvenant(parentId , infoproduit.idproduit)
+          return  getFilteredDetailDelaiTableByLotAndProduitAndAvenant(rowId , infoproduit.idproduit)
           case "activite":
-          return   getFilteredDetailDelaiTableByTacheAndAvenant(parentId)
+          return   getFilteredDetailDelaiTableByTacheAndAvenant(rowId)
              
           default:          
         return  getFilteredDetailDelaiTableByProduitAndAvenant(infoproduit.idproduit,avenantId)
@@ -203,14 +236,14 @@ const loadDelais = ( currentTable:string|null ,tableName:string ="none" ) => {
   } else if (currentTable === "lot") {
       switch (tableName) {
           case "activite":
-            return getFilteredDetailDelaiTableByTacheAndAvenant(parentId)
+            return getFilteredDetailDelaiTableByTacheAndAvenant(rowId)
           
           default:
-           return  getFilteredDetailDelaiTableByLotAndAvenant(parentId,avenantId)
+           return  getFilteredDetailDelaiTableByLotAndAvenant(rowId,avenantId)
              
       }
   } else if (currentTable === "tache") {
-       return  getFilteredDetailDelaiTableByTacheAndAvenant(parentId)
+       return  getFilteredDetailDelaiTableByTacheAndAvenant(rowId)
 
   }
 }
@@ -250,7 +283,14 @@ const loadDelais = ( currentTable:string|null ,tableName:string ="none" ) => {
    <IonContent>
 
 
-<TableCard title={currentTableName} handleRwoClick={handleRowClick} isPending={false} isError={false} data={filteredvalueschildren} columns={columns} />
+<TableCard title={currentTableName}
+ handleRwoClick={handleRowClick}
+  isPending={false}
+   isError={false}
+    data={filteredvalueschildren}
+     columns={columns}
+     onRowContextMenu={(row)=>{handleContextMenuClick(row)}}
+      />
 
 
    <IonSegment
@@ -272,10 +312,10 @@ const loadDelais = ( currentTable:string|null ,tableName:string ="none" ) => {
           </IonSegmentButton>
         </IonSegment>
 
-        {currentDetailTable =="produits" && <TableCard data={detailsproduits?.data} columns={detailProduitsColumns} isError={detailsproduits.isError} isPending={detailsproduits.isPending} hideColumns={true} />}       
-        {currentDetailTable =="charges" && <TableCard data={detailscharges?.data} columns={detailChargesColumns} isError={detailscharges.isError} isPending={detailscharges.isPending} hideColumns={true} />}
-        {currentDetailTable =="delais" && <TableCard data={detailsdelais?.data} columns={detailDelaisColumns} isError={detailsdelais.isError} isPending={detailsdelais.isPending} />}
-        {currentDetailTable =="qualites" && <TableCard data={detailsqualites?.data} columns={detailQualitesColumns} isError={detailsqualites.isError} isPending={detailsqualites.isPending} hideColumns={true}/>}
+        {currentDetailTable =="produits" && <TableCard data={detailsproduits?.data} columns={detailProduitsColumns} isError={detailsproduits.isError} isPending={detailsproduits.isFetching} hideColumns={true} enableSeeAll={true}  title={cardTitle}  />}       
+        {currentDetailTable =="charges" && <TableCard data={detailscharges?.data} columns={detailChargesColumns} isError={detailscharges.isError} isPending={detailscharges.isFetching} hideColumns={true} enableSeeAll={true} title={cardTitle} enableFilterByCharge  />}
+        {currentDetailTable =="delais" && <TableCard data={detailsdelais?.data} columns={detailDelaisColumns} isError={detailsdelais.isError} isPending={detailsdelais.isFetching} enableSeeAll={true}  title={cardTitle} />}
+        {currentDetailTable =="qualites" && <TableCard data={detailsqualites?.data} columns={detailQualitesColumns} isError={detailsqualites.isError} isPending={detailsqualites.isFetching} hideColumns={true} enableSeeAll={true} title={cardTitle} />}
     </IonContent>
  </IonPage>
   )

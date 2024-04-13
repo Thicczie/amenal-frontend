@@ -30,7 +30,6 @@ const { tableRows }:any = useHistory().location.state ?? {};
 
 //console.log('tablerows designations ' , tableRows?.map((row:any)=>row?.lot ? row.lot : null));
 
-console.log('tablrows ',tableRows);
 
 
 

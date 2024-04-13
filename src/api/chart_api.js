@@ -7,29 +7,30 @@ import apiClient from "./apiClient";
 //CHECKED: TRUE
 //Get chart data by project ID and tache IDs
 export const getChartDataByProjectIdAndTacheIds = (projectId, charge, tacheIds) => {
-    return apiClient.get(`/project/${projectId}/tache/charge/${charge}`, {
-        params: {
-            tacheIds: tacheIds
-        }
+    const params = new URLSearchParams();
+    tacheIds.forEach((number) => {
+        params.append("tacheIds", number);
     });
+    return apiClient.get(`ChartData/project/${projectId}/tache/charge/${charge}`, params);
 };
 
 // Get chart data by project ID and lots
 export const getChartDataByProjectIdAndLots = (projectId, charge, lots) => {
-    return apiClient.get(`/project/${projectId}/lot/charge/${charge}`, {
-        params: {
-            lots: lots
-        }
+    const params = new URLSearchParams();
+    lots.forEach((number) => {
+        params.append("lots", number);
     });
+
+    return apiClient.get(`ChartData/project/${projectId}/lot/charge/${charge}`, params);
 };
 
 // Get chart data by project ID and produits
-export const getTacheTableByProjectId = (projectId, charge, produits) => {
-    return apiClient.get(`/project/${projectId}/produit/charge/${charge}`, {
-        params: {
-            produits: produits
-        }
+export const getChartDataByProjectIdAndProduits = (projectId, charge, produits) => {
+    const params = new URLSearchParams();
+    produits.forEach((number) => {
+        params.append("produits", number);
     });
+    return apiClient.get(`ChartData/project/${projectId}/produit/charge/${charge}`, params);
 };
 
 
@@ -39,27 +40,32 @@ export const getTacheTableByProjectId = (projectId, charge, produits) => {
 
 // Get chart data by avenant ID and tache IDs
 export const getChartDataByAvenantIdAndTacheIds = (avenantId, charge, tacheIds) => {
-    return apiClient.get(`/avenant/${avenantId}/tache/charge/${charge}`, {
-        params: {
-            tacheIds: tacheIds
-        }
+    const params = new URLSearchParams();
+    tacheIds.forEach((number) => {
+        params.append("tacheIds", number);
     });
+    return apiClient.get(`ChartData/avenant/${avenantId}/tache/charge/${charge}`,
+        params
+
+    );
 };
 
 // Get chart data by avenant ID and lots
 export const getChartDataByAvenantIdAndLots = (avenantId, charge, lots) => {
-    return apiClient.get(`/avenant/${avenantId}/lot/charge/${charge}`, {
-        params: {
-            lots: lots
-        }
+    const params = new URLSearchParams();
+    lots.forEach((number) => {
+        params.append("lots", number);
     });
+
+    return apiClient.get(`ChartData/avenant/${avenantId}/lot/charge/${charge}`, params);
 };
 
 // Get chart data by avenant ID and produits
 export const getChartDataByAvenantIdAndProduits = (avenantId, charge, produits) => {
-    return apiClient.get(`/avenant/${avenantId}/produit/charge/${charge}`, {
-        params: {
-            produits: produits
-        }
+    const params = new URLSearchParams();
+    produits.forEach((number) => {
+        params.append("produits", number);
     });
+
+    return apiClient.get(`ChartData/avenant/${avenantId}/produit/charge/${charge}`, params);
 };

@@ -47,6 +47,9 @@ import Details from './pages/Details';
 import Details2 from './pages/Details2';
 import { AppProvider } from './contexts/AppContext';
 import Graph from './pages/Graph';
+import ItemDetails2 from './pages/ItemDetails2';
+import AllDetails from './pages/AllDetails';
+import Besoins from './pages/achat/Besoins';
 
 setupIonicReact();
 const queryClient= new QueryClient();
@@ -57,9 +60,9 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
 
       <CssVarsProvider>
-        <AppProvider>
+        {/* <AppProvider> */}
         <AppContent />
-        </AppProvider>
+        {/* </AppProvider> */}
       </CssVarsProvider>
       </QueryClientProvider>
     </IonApp>
@@ -95,14 +98,34 @@ const AppContent: React.FC = () => {
 
 
     <IonRouterOutlet id="main">
+      <AppProvider>
       <Route exact path="/home" component={Home} />
-      <Route exact path="/"><Redirect to="/home" /></Route>
+      <Route exact path="/"><Redirect to="/budget" /></Route>
       <Route path="/budget" component={CompteBdg} />
       <Route exact path='/iteminfo' component={ItemInfo}/>
       <Route exact path='/iteminfo/iteminfodetail' component={ItemDetails}/>
+      <Route exact path='/iteminfo/iteminfodetail2' component={ItemDetails2}/>
+      <Route exact path='/AllDetails' component={AllDetails}/>
       <Route exact path='/details' component={Details}/>
       <Route exact path='/details2' component={Details2}/>
       <Route exact path='/graph' component={Graph}/>
+      </AppProvider>
+
+
+      <Route exact path="/achat" component={Besoins}/>
+      <Route exact path="/achat/bsn" component ={Besoins}/>
+      <Route exact path="/achat/ddf" component={Listes} />
+      <Route exact path="/achat/dvf" component={Listes} />
+      <Route exact path="/achat/cmf" component={Listes} />
+      <Route exact path="/achat/rcf" component={Listes} />
+      <Route exact path="/achat/fcf" component={Listes} />
+      <Route exact path="/achat/pmf" component={Listes} />
+      <Route exact path="/achat/frs" component={Listes} />
+      <Route exact path="/achat/chg" component={Listes} />
+      <Route exact path="/achat/exploitation" component={Listes} />
+      <Route exact path="/achat/cmt" component={Listes} />
+
+
 
 
   

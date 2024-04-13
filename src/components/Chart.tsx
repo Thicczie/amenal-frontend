@@ -4,7 +4,11 @@ import { QueryKey, useQuery } from "@tanstack/react-query";
 import {
   getChartDataByAvenantIdAndTacheIds,
   getChartDataByAvenantIdAndLots,
-  getChartDataByAvenantIdAndProduits
+  getChartDataByAvenantIdAndProduits,
+  getChartDataByProjectIdAndLots,
+  getChartDataByProjectIdAndProduits,
+  getChartDataByProjectIdAndTacheIds,
+  
 } from '../api/chart_api'
 
 import {
@@ -31,7 +35,7 @@ const Chart:React.FC <chartProps> = ({tableRows}) => {
   const [isQte, setIsQte] = useState(true);
   const [isPonc, setIsPonc] = useState(true);
 
-  const {currentTable}=useAppContext();  
+  const {currentTable , currentSigma}=useAppContext();  
 
 
   
@@ -40,31 +44,34 @@ const Chart:React.FC <chartProps> = ({tableRows}) => {
 
 
 
-  const {currentCharge, avenantId }= useAppContext();
+  const {currentCharge, avenantId , projectId }= useAppContext();
   const tacheIds = [1, 2, 3];
 
   //get chart data:
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["chartData", avenantId, currentCharge] as QueryKey,
-    queryFn: () =>  loadChartData(avenantId, currentCharge)
+    queryFn: () =>  loadChartData(avenantId, currentCharge , projectId)
   });
 
 
 
-  const loadChartData = (avenantId: number|string|null, charge: string |null) => {
+  const loadChartData = (avenantId: number|string|null|undefined, charge: string |null , projectId:number|string|null|undefined ) => {
 
 
     switch (currentTable) {
       case'produit':
         
       const designationsList :string[] = tableRows.map((row: any) => row.designation);
+      if(currentSigma) return getChartDataByProjectIdAndProduits(projectId, charge , designationsList);
       return getChartDataByAvenantIdAndProduits(avenantId, charge , designationsList);
       case 'lot':
         const lotList:string [] = tableRows.map((row: any) => row.lot);
+      if(currentSigma) return getChartDataByProjectIdAndLots(projectId,charge,lotList)
       return getChartDataByAvenantIdAndLots(avenantId,charge,lotList)
       case 'tache':
 
       const tacheIds:number[]= tableRows.map((row: any) => row.id);
+      if(currentSigma)return getChartDataByProjectIdAndTacheIds(projectId,charge,tacheIds)
       return getChartDataByAvenantIdAndTacheIds(avenantId,charge,tacheIds)
 
       default : 
@@ -84,32 +91,32 @@ const Chart:React.FC <chartProps> = ({tableRows}) => {
   //prepare data for chart:
   let lineChartData: any = [];
   if (isCum && isQte && isPonc) {
-    lineChartData.push(data.data.qteCumChargePonctuelle);
-    lineChartData.push(data.data.qteCumProduitPonctuelle);
+    lineChartData.push(data?.data?.qteCumProduitPonctuelle);
+    lineChartData.push(data?.data?.qteCumChargePonctuelle);
   } else if (!isCum && isQte && isPonc) {
-    lineChartData.push(data.data.qteJourChargePonctuelle);
-    lineChartData.push(data.data.qteJourProduitPonctuelle);
+    lineChartData.push(data?.data?.qteJourChargePonctuelle);
+    lineChartData.push(data?.data?.qteJourProduitPonctuelle);
   } else if (!isCum && !isQte && isPonc) {
-    lineChartData.push(data.data.mtJourChargePonctuelle);
-    lineChartData.push(data.data.mtJourProduitPonctuelle);
+    lineChartData.push(data?.data?.mtJourChargePonctuelle);
+    lineChartData.push(data?.data?.mtJourProduitPonctuelle);
   } else if (isCum && !isQte && isPonc) {
-    lineChartData.push(data.data.mtCumChargePonctuelle);
-    lineChartData.push(data.data.mtCumProduitPonctuelle);
+    lineChartData.push(data?.data?.mtCumChargePonctuelle);
+    lineChartData.push(data?.data?.mtCumProduitPonctuelle);
   } else if (isCum && isQte && !isPonc) {
-    lineChartData.push(data.data.qteCumChargeLisse);
-    lineChartData.push(data.data.qteCumProduitLisse);
+    lineChartData.push(data?.data?.qteCumChargeLisse);
+    lineChartData.push(data?.data?.qteCumProduitLisse);
   } else if (!isCum && isQte && !isPonc) {
-    lineChartData.push(data.data.qteJourChargeLisse);
-    lineChartData.push(data.data.qteJourProduitLisse);
+    lineChartData.push(data?.data?.qteJourChargeLisse);
+    lineChartData.push(data?.data?.qteJourProduitLisse);
   } else if (!isCum && !isQte && !isPonc) {
-    lineChartData.push(data.data.mtJourChargeLisse);
-    lineChartData.push(data.data.mtJourProduitLisse);
+    lineChartData.push(data?.data?.mtJourChargeLisse);
+    lineChartData.push(data?.data?.mtJourProduitLisse);
   } else if (isCum && !isQte && !isPonc) {
-    lineChartData.push(data.data.mtCumChargeLisse);
-    lineChartData.push(data.data.mtCumProduitLisse);
+    lineChartData.push(data?.data?.mtCumChargeLisse);
+    lineChartData.push(data?.data?.mtCumProduitLisse);
   }
 
-  const datesArray = data.data.labels;
+  const datesArray = data?.data?.labels;
 
   // Merge the arrays into an array of objects
   const mergedLineChartData = [["Days", "Charges", "Produits"]];

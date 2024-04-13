@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">amenal-frontend</string>
-    <string name="title_activity_main">amenal-frontend</string>
+    <string name="app_name">amenal</string>
+    <string name="title_activity_main">amenal</string>
     <string name="package_name">io.ionic.starter</string>
     <string name="custom_url_scheme">io.ionic.starter</string>
 </resources>

@@ -19,7 +19,7 @@ const useColumns = (data:any) => {
 
     }
 
-      const firstDataItem: any[] = (Data as any[])[0];
+      const firstDataItem: any[] = (Data as any[])[0] || {};
 
   
      Object.entries(firstDataItem).forEach(([key, value]: [string, any]) => {
