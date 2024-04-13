@@ -51,12 +51,12 @@ const SideMenu:React.FC = () => {
       content: [
         {
           label:"BSN",
-          path:"/achat/bsn",
+          path:"/bsn",
           
         },
         {
           label:"DDF",
-          path:"/achat/ddf",
+          path:"/ddf",
           
         }, {
           label:"DVF",
@@ -64,32 +64,32 @@ const SideMenu:React.FC = () => {
           
         }, {
           label:"RCF",
-          path:"/achat/rcf",
+          path:"/rcf",
           
         }, {
           label:"FCF",
-          path:"/achat/fcf",
+          path:"/fcf",
           
         }, {
           label:"PMF",
-          path:"/achat/pmf",
+          path:"/pmf",
           
         }, {
           label:"FRS",
-          path:"/achat/frs",
+          path:"/frs",
           
         }, {
           label:"CHG",
-          path:"/achat/chg",
+          path:"/chg",
           
         },
         {
           label:"EXPLOITATION",
-          path:"/achat/exploitation",
+          path:"/exploitation",
           
         }, {
           label:"CMT",
-          path:"/achat/cmt",
+          path:"/cmt",
           
         },
      

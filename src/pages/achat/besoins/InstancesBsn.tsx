@@ -18,6 +18,10 @@ const InstancesBsn:React.FC = (props: Props) => {
 
     const besoinsColumns = useColumns(besoins?.data?.data as any[])
 
+    const handleRowClick = (row:any) => {
+        console.log(row?.original)
+    }
+
   return (
     <IonPage>
   <IonHeader>
@@ -33,7 +37,9 @@ const InstancesBsn:React.FC = (props: Props) => {
   <IonContent class="ion-padding">
 
 
-<InfoCard columns={besoinsColumns} data={besoins?.data?.data as any[]} isPending={besoins.isLoading} isError={besoins.isError} />
+<InfoCard  columns={besoinsColumns} data={besoins?.data?.data as any[]} isPending={besoins.isLoading} isError={besoins.isError}
+        handleRwoClick={handleRowClick} 
+/>
 
 
   </IonContent>

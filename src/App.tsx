@@ -111,19 +111,18 @@ const AppContent: React.FC = () => {
       <Route exact path='/graph' component={Graph}/>
       </AppProvider>
 
-
-      <Route exact path="/achat" component={Besoins}/>
-      <Route exact path="/achat/bsn" component ={Besoins}/>
-      <Route exact path="/achat/ddf" component={Listes} />
-      <Route exact path="/achat/dvf" component={Listes} />
-      <Route exact path="/achat/cmf" component={Listes} />
-      <Route exact path="/achat/rcf" component={Listes} />
-      <Route exact path="/achat/fcf" component={Listes} />
-      <Route exact path="/achat/pmf" component={Listes} />
-      <Route exact path="/achat/frs" component={Listes} />
-      <Route exact path="/achat/chg" component={Listes} />
-      <Route exact path="/achat/exploitation" component={Listes} />
-      <Route exact path="/achat/cmt" component={Listes} />
+      {/* <Route exact path="/achat" component={Besoins}/> */}
+      <Route exact path="/bsn" component ={Besoins}/>
+      <Route exact path="/dvf" component={Listes} />
+      <Route exact path="/cmf" component={Listes} />
+      <Route exact path="/rcf" component={Listes} />
+      <Route exact path="/fcf" component={Listes} />
+      <Route exact path="/pmf" component={Listes} />
+      <Route exact path="/frs" component={Listes} />
+      <Route exact path="/chg" component={Listes} />
+      <Route exact path="/exploitation" component={Listes} />
+      <Route exact path="/cmt" component={Listes} />
+      <Route exact path="/ddf" component={Listes} />
 
 
 
