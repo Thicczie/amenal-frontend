@@ -3,8 +3,11 @@ import { IonCard, IonCardHeader, IonCardContent, IonList, IonGrid, IonRow, IonCo
 import { AvLayout,BdgLayout  , AvTitleLayout,BdgTitleLayout, TLayout, ILayout} from '../constants/infoLayout';
 import { getProjectById , getAvenantById } from '../api/api';
 import { useQuery } from '@tanstack/react-query';
-import Details from '../pages/Details';
+import Details from '../pages/budget/Details';
 import { useAppContext } from '../contexts/AppContext';
+import { getBesoins, getBesoinsById, getChargeStandardsById, getCommandesById, getDemandesDevisById, getDevissById, getFacturesById, getFournisseursById, getPaiementsById, getReceptionsById } from '../api/achat/achat_api';
+import { useParams } from 'react-router-dom';
+
 
 interface InfoCardProps {
     currentInfo: string;
@@ -17,7 +20,10 @@ const InfoCard: React.FC<InfoCardProps> = ({ currentInfo , Layout , TitleLayout 
 
   //const Layout = currentInfo === "AV" ? AvLayout : BdgLayout; 
   // const TitleLayout = currentInfo === "AV" ? AvTitleLayout : BdgTitleLayout;
-const {projectId,avenantId}=useAppContext();
+const {projectId,avenantId}=useParams();
+ //const { id }:any =useHistory().location.state ?? {};
+ const id = 1;
+
  
 
 
@@ -27,7 +33,29 @@ const {projectId,avenantId}=useAppContext();
         return getProjectById(projectId);
       case 'AV':
         return getAvenantById(avenantId);
-   
+      case 'BSN':
+        return getBesoinsById(id);
+      case 'DDF':
+        return getDemandesDevisById(id);
+      case 'DVF':
+        return getDevissById(id);
+      case 'CMF':
+        return getCommandesById(id);
+      case 'RCF':
+        return  getReceptionsById(id);
+      case 'FCF':
+        return getFacturesById(id);
+      case 'FRS':
+        return getFournisseursById(id); ;
+      case 'PMF':
+        return getPaiementsById(id) ;
+      case 'CHG':
+        return getChargeStandardsById(id) ;
+      case 'CMT':
+        return ;
+      case 'EXPLOITATION':
+        return ;
+
       default:
         return null;
     }
@@ -54,7 +82,7 @@ const {projectId,avenantId}=useAppContext();
                         { isPending ?<IonSpinner name="crescent"/>
                             :isError ? <IonLabel color={'danger'}>Erreur</IonLabel> 
                             :  <>
-                            {  currentInfo.toUpperCase()+"-"+data?.data[TitleLayout.date]+'/'+data?.data[TitleLayout.ref]}
+                            {currentInfo.toUpperCase() + "-" +( eval('data?.data.' +TitleLayout?.date) ?? '-' ) + '/'+ eval('data?.data.' + TitleLayout?.ref) ?? '-'}
                             </>
 
                         }
@@ -74,7 +102,7 @@ const {projectId,avenantId}=useAppContext();
           <IonLabel>{label}</IonLabel>
         </IonCol>
         <IonCol>
-          <IonLabel>{  typeof data?.data[key] === 'boolean'? (data?.data[key] ? 'OUI' :'NON ') : data?.data[key]}</IonLabel>
+          <IonLabel>{  typeof eval('data?.data.' + key) === 'boolean'? (eval('data?.data.' + key) ? 'OUI' :'NON ') :(eval('data?.data.' + key) ?? '-')}</IonLabel>
           {/* TODO: Add coloring */}
         </IonCol>
         

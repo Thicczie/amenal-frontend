@@ -283,6 +283,7 @@ export const saveAllDetailQualiteAttentes = async (detailQualiteAttentes) => {
     }
 };
 
+
 // get DetailsAttente By avenant Id:
 export const getDetailChargeAttentesByAvenantId = (avenantId) => {
     return apiClient.get(`/detailChargeAttentes/avenant/${avenantId}`);

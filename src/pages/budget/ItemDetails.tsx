@@ -3,31 +3,37 @@ import { IonBackButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonItem,
 import React, { useEffect } from 'react'
 import { useHistory } from 'react-router';
 
-import { getProduitTableByAvenantId,getLotTableByAvenantId,getTacheTableByAvenantId , getSigmaLotTable,getSigmaProduitTable,getSigmaTacheTable } from '../api/api';
+import { getProduitTableByAvenantId,getLotTableByAvenantId,getTacheTableByAvenantId , getSigmaLotTable,getSigmaProduitTable,getSigmaTacheTable } from '../../api/api';
 import { useQueries, useQuery } from '@tanstack/react-query';
-import TableCard from '../components/TableCard';
-import useColumns from '../hooks/useColumns';
-import InfoCard from '../components/InfoCard';
-import { useAppContext } from '../contexts/AppContext';
+import TableCard from '../../components/TableCard';
+import useColumns from '../../hooks/useColumns';
+import InfoCard from '../../components/InfoCard';
+import { useAppContext } from '../../contexts/AppContext';
 import { Button } from '@mui/material';
-import ButtonList from '../components/buttonList';
-import TableSelect from '../components/TableSelect';
-import { getFilteredDetailChargeTableByLotAndAvenant, getFilteredDetailChargeTableByLotAndProduitAndAvenant, getFilteredDetailChargeTableByLotAndProject, getFilteredDetailChargeTableByProduitAndAvenant, getFilteredDetailChargeTableByProduitAndLotAndProject, getFilteredDetailChargeTableByProduitAndProject, getFilteredDetailChargeTableByTacheAndAvenant, getFilteredDetailChargeTableByTacheAndProject, getFilteredDetailDelaiTableByLotAndAvenant, getFilteredDetailDelaiTableByLotAndProduitAndAvenant, getFilteredDetailDelaiTableByLotAndProject, getFilteredDetailDelaiTableByProduitAndAvenant, getFilteredDetailDelaiTableByProduitAndLotAndProject, getFilteredDetailDelaiTableByProduitAndProject, getFilteredDetailDelaiTableByTacheAndAvenant, getFilteredDetailDelaiTableByTacheAndProject, getFilteredDetailProduitTableByLotAndAvenant, getFilteredDetailProduitTableByLotAndProduitAndAvenant, getFilteredDetailProduitTableByLotAndProject, getFilteredDetailProduitTableByProduitAndAvenant, getFilteredDetailProduitTableByProduitAndLotAndProject, getFilteredDetailProduitTableByProduitAndProject, getFilteredDetailProduitTableByTacheAndAvenant, getFilteredDetailProduitTableByTacheAndProject, getFilteredDetailQualiteTableByLotAndAvenant, getFilteredDetailQualiteTableByLotAndProduitAndAvenant, getFilteredDetailQualiteTableByLotAndProject, getFilteredDetailQualiteTableByProduitAndAvenant, getFilteredDetailQualiteTableByProduitAndLotAndProject, getFilteredDetailQualiteTableByProduitAndProject, getFilteredDetailQualiteTableByTacheAndAvenant, getFilteredDetailQualiteTableByTacheAndProject } from '../api/detail_api';
-import SigmaCheckbox from '../components/SigmaCheckbox';
-import { AvLayout, AvTitleLayout } from '../constants/infoLayout';
+import ButtonList from '../../components/buttonList';
+import TableSelect from '../../components/TableSelect';
+import { getFilteredDetailChargeTableByLotAndAvenant, getFilteredDetailChargeTableByLotAndProduitAndAvenant, getFilteredDetailChargeTableByLotAndProject, getFilteredDetailChargeTableByProduitAndAvenant, getFilteredDetailChargeTableByProduitAndLotAndProject, getFilteredDetailChargeTableByProduitAndProject, getFilteredDetailChargeTableByTacheAndAvenant, getFilteredDetailChargeTableByTacheAndProject, getFilteredDetailDelaiTableByLotAndAvenant, getFilteredDetailDelaiTableByLotAndProduitAndAvenant, getFilteredDetailDelaiTableByLotAndProject, getFilteredDetailDelaiTableByProduitAndAvenant, getFilteredDetailDelaiTableByProduitAndLotAndProject, getFilteredDetailDelaiTableByProduitAndProject, getFilteredDetailDelaiTableByTacheAndAvenant, getFilteredDetailDelaiTableByTacheAndProject, getFilteredDetailProduitTableByLotAndAvenant, getFilteredDetailProduitTableByLotAndProduitAndAvenant, getFilteredDetailProduitTableByLotAndProject, getFilteredDetailProduitTableByProduitAndAvenant, getFilteredDetailProduitTableByProduitAndLotAndProject, getFilteredDetailProduitTableByProduitAndProject, getFilteredDetailProduitTableByTacheAndAvenant, getFilteredDetailProduitTableByTacheAndProject, getFilteredDetailQualiteTableByLotAndAvenant, getFilteredDetailQualiteTableByLotAndProduitAndAvenant, getFilteredDetailQualiteTableByLotAndProject, getFilteredDetailQualiteTableByProduitAndAvenant, getFilteredDetailQualiteTableByProduitAndLotAndProject, getFilteredDetailQualiteTableByProduitAndProject, getFilteredDetailQualiteTableByTacheAndAvenant, getFilteredDetailQualiteTableByTacheAndProject } from '../../api/detail_api';
+import SigmaCheckbox from '../../components/SigmaCheckbox';
+import { AvLayout, AvTitleLayout } from '../../constants/infoLayout';
+import AddDialogButton from '../../components/AddDialogButton';
+import { detailProduitFormFields, lotFields, produitFields, tacheFields } from '../../constants/FormFields';
+import BackButton from '../../components/BackButton';
+import { Outlet, useMatch, useNavigate, useParams } from 'react-router-dom';
 
 
 
 
 
-type Props = {}
+type Props = {
+isComponentParent?:boolean
+}
 
 //this is the AV screen
-const ItemDetails:React.FC = () => {
+const ItemDetails:React.FC<Props> = ({isComponentParent=false}) => {
 
-  const { AllRowData ,displayedRowData , tableName="" }:any = useHistory().location.state ?? {};
   const {currentTable, setCurrentTable ,infoproduit } = useAppContext();
-  const {projectId,avenantId ,currentCharge , currentSigma ,setInfoProduit}=useAppContext();
+  const { currentCharge , currentSigma ,setInfoProduit}=useAppContext();
+  const {projectId , avenantId}:any= useParams();
 
 //current segment
   const [currentDetailTable ,setCurrentDetailTable]=React.useState<string>("produits");
@@ -48,21 +54,8 @@ const ItemDetails:React.FC = () => {
 
 
   const route = useHistory();
-
-  //TOOD: this will be the  voir detail on click 
-  // const handleRowClick = (row:any) => {
-
-  //   const rowchildren= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => value )[0];
-  //   if (currentTable=='produit') setInfoProduit({idproduit:row.original?.id,designationProduit:row.original?.designation})
-  //   if((rowchildren as any[])?.length > 0) {
-  //     route.push({pathname:'/details',state:{AllRowData:row.original,displayedRowData:row._valuesCache , currentTable:currentTable,
-  //       tableName:"parent"
-  //     }})
-    
-  //   }
-
-  // }
-
+  const navigate= useNavigate();
+  
 
   const handleContextMenuClick = (row:any) => {
 
@@ -73,14 +66,16 @@ const ItemDetails:React.FC = () => {
     const rowchildren= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => value )[0];
 
       if (currentTable=='produit') setInfoProduit({idproduit:row.original?.id,designationProduit:row.original?.designation})
-      if((rowchildren as any[])?.length > 0) {
+      // if((rowchildren as any[])?.length > 0) {
 
         const tableName= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value))[0][0];
 
         
-        route.push({pathname:'/details',state:{AllRowData:row.original,displayedRowData:row._valuesCache , currentTable:currentTable,
-          tableName:tableName
-        }})
+        // route.push({pathname:'/details',state:{AllRowData:row.original,displayedRowData:row._valuesCache , currentTable:currentTable,
+        //   tableName:tableName
+        // }})
+        navigate(`details/${currentTable}/${tableName}`,{state:{AllRowData:row.original}})
+
 
 
 //        const filteredvalueschildren = AllRowData? Object.entries(AllRowData).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => value )[0]:[];
@@ -90,7 +85,7 @@ const ItemDetails:React.FC = () => {
   //      const tableName :string | null= row.original ? Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => key )[0]:"produit";
          // console.log('subrows array ' ,  Object.entries(AllRowData).filter(([key, value]) =>  Array.isArray(value)) );
       
-  }
+  //}
 }
 
 
@@ -146,6 +141,9 @@ const ItemDetails:React.FC = () => {
     setRowId(null);
     setInfoProduit({idproduit:null,designationProduit:null})
   }, [currentTable ,currentSigma ])
+
+  
+  
   
   
   
@@ -333,33 +331,12 @@ const ItemDetails:React.FC = () => {
   };
   
 
+  const Content:React.FC=()=>{
+      return (
+        <IonContent>
 
 
-
-
-  return (
-    <IonPage>
-     <IonHeader>
-    <IonToolbar>
-    <IonButtons slot='start'>
-            <IonBackButton></IonBackButton>
-        </IonButtons>
-        <div className='flex flex-row'>
-        <IonTitle >Détails</IonTitle>
-
-        <SigmaCheckbox/>
-        <TableSelect/>
-        </div>
-  
-
-
-    </IonToolbar>
-  </IonHeader>
-    <IonContent>
-
-
-    {!currentSigma &&<InfoCard TitleLayout={AvTitleLayout} Layout={AvLayout} currentInfo={"AV"} />
-}
+      {!isComponentParent &&<InfoCard TitleLayout={AvTitleLayout} Layout={AvLayout} currentInfo={"AV"} />}
 
   
 
@@ -374,7 +351,8 @@ const ItemDetails:React.FC = () => {
     enableGraph={true}
     onRowContextMenu={(rowData:any)=>handleContextMenuClick(rowData)}
     showFilteredBy={true}
-    
+    HeaderContent={<AddDialogButton formFields={currentTable === "produit" ? produitFields : currentTable === "lot" ? lotFields : tacheFields} currentForm={currentTable} />}
+    tableName={currentTable}
 />
     
 
@@ -400,13 +378,38 @@ const ItemDetails:React.FC = () => {
           </IonSegmentButton>
         </IonSegment>
 
-        {currentDetailTable =="produits" && <TableCard data={detailsproduits?.data} columns={detailProduitsColumns} isError={detailsproduits.isError} isPending={detailsproduits.isFetching} hideColumns={true} title={cardTitle} enableSeeAll={true} />}       
-        {currentDetailTable =="charges" && <TableCard data={detailscharges?.data} columns={detailChargesColumns} isError={detailscharges.isError} isPending={detailscharges.isFetching} hideColumns={true} title={cardTitle} enableSeeAll={true} enableFilterByCharge />}
-        {currentDetailTable =="delais" && <TableCard data={detailsdelais?.data} columns={detailDelaisColumns} isError={detailsdelais.isError} isPending={detailsdelais.isFetching} title={cardTitle} enableSeeAll={true} />}
-        {currentDetailTable =="qualites" && <TableCard data={detailsqualites?.data} columns={detailQualitesColumns} isError={detailsqualites.isError} isPending={detailsqualites.isFetching} hideColumns={true} title={cardTitle} enableSeeAll={true}/>}
+        {currentDetailTable =="produits" && <TableCard tableName='detailProduit' data={detailsproduits?.data} columns={detailProduitsColumns} isError={detailsproduits.isError} isPending={detailsproduits.isFetching} hideColumns={true} title={cardTitle} enableSeeAll={true} />}       
+        {currentDetailTable =="charges" && <TableCard tableName='detailCharge' data={detailscharges?.data} columns={detailChargesColumns} isError={detailscharges.isError} isPending={detailscharges.isFetching} hideColumns={true} title={cardTitle} enableSeeAll={true} enableFilterByCharge />}
+        {currentDetailTable =="delais" && <TableCard tableName='detailDelai' data={detailsdelais?.data} columns={detailDelaisColumns} isError={detailsdelais.isError} isPending={detailsdelais.isFetching} title={cardTitle} enableSeeAll={true} />}
+        {currentDetailTable =="qualites" && <TableCard tableName='detailQualite' data={detailsqualites?.data} columns={detailQualitesColumns} isError={detailsqualites.isError} isPending={detailsqualites.isFetching} hideColumns={true} title={cardTitle} enableSeeAll={true}/>}
    
       
     </IonContent>
+      )
+  }
+
+  const match = useMatch('/budget/iteminfo/:projectId/iteminfodetail/:avenantId')
+
+  if(currentSigma && isComponentParent) return <Content/>
+  if(!match ) return <Outlet/>
+  return (
+    <IonPage>
+     <IonHeader>
+    <IonToolbar>
+    <IonButtons slot='start'>
+            <IonBackButton></IonBackButton>
+            <BackButton/>
+        </IonButtons>
+        <div className='flex flex-row'>
+        <IonTitle >Détails</IonTitle>
+        <TableSelect/>
+        </div>
+  
+
+
+    </IonToolbar>
+  </IonHeader>
+  <Content/>
   </IonPage>
   )
 }

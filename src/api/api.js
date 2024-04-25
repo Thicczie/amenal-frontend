@@ -3,12 +3,14 @@ import apiClient from "./apiClient";
 
 // ProjetInfos
 export const getProjects = () => apiClient.get("/projects");
+export const getTaches = () => apiClient.get("/taches");
 
 export const getProjectById = (id) => apiClient.get("/projects/" + id);
 export const getAvenantsByProjectId = (id) => apiClient.get("/avenants/project/" + id);
 export const getAvenantById = (avenantId) => {
   return apiClient.get(`/avenants/${avenantId}`);
 };
+
 
 
 

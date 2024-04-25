@@ -1,7 +1,8 @@
 
-import React from "react";
+import React, { Children, useMemo } from "react";
 import {
 
+  IonButton,
   IonButtons,
   IonCardTitle,
   IonContent,
@@ -11,10 +12,26 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { Formik, Form, Field, FormikProps, useField, FieldHookConfig  } from "formik";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import { Fields, lotFields, produitFields, tacheFields } from "../constants/FormFields";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
+import AddForm from "./AddForm";
 
-//this will display the form for adding a new instance of a budget
 
-const Ajout: React.FC = () => {
+
+type AjoutProps = {
+  FormName : string;
+  formFields: Fields;
+
+}
+
+const Ajout: React.FC<AjoutProps> = (props:AjoutProps) => {
+
+
+
   return   <IonPage>
     <IonHeader>
         <IonToolbar>
@@ -22,12 +39,13 @@ const Ajout: React.FC = () => {
           <IonMenuButton  />
           </IonButtons>
 
-          <IonTitle>Ajout</IonTitle>
+          <IonTitle>{'Ajout '+props.FormName}</IonTitle>
 
         </IonToolbar>
       </IonHeader>
   <IonContent>
-    <div >ajout</div>
+
+      <AddForm currentForm={props.FormName} formFields={props.formFields}  />
 </IonContent>
 </IonPage>
 };

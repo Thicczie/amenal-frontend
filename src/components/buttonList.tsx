@@ -15,7 +15,7 @@ import{
     IonButton,
     IonNav
     } from '@ionic/react'
-import Graph from '../pages/Graph'
+import Graph from '../pages/budget/Graph'
 import { useHistory } from 'react-router';
 
 import AddIcon from '@mui/icons-material/Add';
@@ -25,16 +25,18 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { MRT_TableInstance } from 'material-react-table';
+import { useNavigate } from 'react-router-dom';
 
 
-interface buttonListProps {
+interface ButtonListProps {
   table: MRT_TableInstance<any>;
 }
 
 
-const buttonList :React.FC<buttonListProps> = ({table}) => {
+const ButtonList :React.FC<ButtonListProps> = ({table}) => {
 
-  const route = useHistory();
+  const navigate=useNavigate();
+
   const popoverRef=React.useRef<HTMLIonPopoverElement>(null);
 
   const [viewAnchorEl, setViewAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -42,6 +44,10 @@ const [addAnchorEl, setAddAnchorEl] = React.useState<null | HTMLElement>(null);
 
 const viewOpen=Boolean(viewAnchorEl);
 const addOpen=Boolean(addAnchorEl);
+
+
+const tables=table.getFilteredRowModel().rows;
+  const tableRows = tables.map((row) => row.original);
 
 
 const handleViewClick = (event:any) => {
@@ -58,10 +64,9 @@ const handleClose=()=>{
 }
 const Navigate=(to?:string)=>{
 
-  const tables=table.getFilteredRowModel().rows;
-  const tableRows = tables.map((row) => row.original);
+  
   handleClose();
-  if(to) route.push({ pathname: "/" + to, state: { tableRows:tableRows} });
+  if(to) navigate(to,{state:{tableRows}})
   else return;
   
   // navRef.current?.push(Graph);
@@ -91,6 +96,7 @@ const Navigate=(to?:string)=>{
         onClose={handleClose}
       >
         <MenuItem onClick={()=>Navigate('graph')}>Graph</MenuItem>
+        
         <MenuItem onClick={()=>Navigate()}>Gantt</MenuItem>
 
       </Menu>
@@ -115,4 +121,4 @@ const Navigate=(to?:string)=>{
   )
 }
 
-export default buttonList
+export default ButtonList

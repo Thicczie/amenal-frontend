@@ -5,7 +5,7 @@ interface LineChartProps {
   data: any;
 }
 const options = {
-  title: "Company Performance",
+
   curveType: "function",
   legend: { position: "bottom" },
 };

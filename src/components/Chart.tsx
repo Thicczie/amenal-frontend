@@ -22,20 +22,25 @@ import LineChart from "./charts/LineChart";
 import ChartsHeader from "./charts/ChartsHeader";
 import BarChart from "./charts/BarChart";
 import { useAppContext } from "../contexts/AppContext";
+import { IonSpinner } from "@ionic/react";
+import { useLocation } from "react-router-dom";
 
 
 
 interface chartProps{
   tableRows:any[];
+  avenantId:number|string|null|undefined;
+  projectId:number|string|null|undefined;
+
 }
 
 // const Line = ({ avenantId, charge, tacheIds }) => {
-const Chart:React.FC <chartProps> = ({tableRows}) => {
+const Chart:React.FC <chartProps> = ({tableRows , avenantId , projectId}) => {
   const [isCum, setIsCum] = useState(true);
   const [isQte, setIsQte] = useState(true);
   const [isPonc, setIsPonc] = useState(true);
 
-  const {currentTable , currentSigma}=useAppContext();  
+
 
 
   
@@ -44,8 +49,7 @@ const Chart:React.FC <chartProps> = ({tableRows}) => {
 
 
 
-  const {currentCharge, avenantId , projectId }= useAppContext();
-  const tacheIds = [1, 2, 3];
+  const {currentCharge , currentSigma , currentTable }= useAppContext();
 
   //get chart data:
   const { isLoading, isError, data, error } = useQuery({
@@ -60,17 +64,21 @@ const Chart:React.FC <chartProps> = ({tableRows}) => {
 
     switch (currentTable) {
       case'produit':
-        
-      const designationsList :string[] = tableRows.map((row: any) => row.designation);
+      
+      const designationsList :string[] = tableRows?.map((row: any) => row.designation);
+      if (designationsList.length === 0) return null;
       if(currentSigma) return getChartDataByProjectIdAndProduits(projectId, charge , designationsList);
       return getChartDataByAvenantIdAndProduits(avenantId, charge , designationsList);
       case 'lot':
-        const lotList:string [] = tableRows.map((row: any) => row.lot);
+
+        const lotList:string [] = tableRows?.map((row: any) => row.lot);
+      if (lotList.length === 0) return null;
       if(currentSigma) return getChartDataByProjectIdAndLots(projectId,charge,lotList)
       return getChartDataByAvenantIdAndLots(avenantId,charge,lotList)
       case 'tache':
 
-      const tacheIds:number[]= tableRows.map((row: any) => row.id);
+      const tacheIds:number[]= tableRows?.map((row: any) => row.id);
+      if (tacheIds.length === 0) return null;
       if(currentSigma)return getChartDataByProjectIdAndTacheIds(projectId,charge,tacheIds)
       return getChartDataByAvenantIdAndTacheIds(avenantId,charge,tacheIds)
 
@@ -84,8 +92,7 @@ const Chart:React.FC <chartProps> = ({tableRows}) => {
 
 
 
-  if (!data || isLoading) return <div>Loading...</div>;
-
+  if ( isLoading) return <IonSpinner name="crescent" />;  
   if (isError) return <div>Error: {error.message}</div>;
 
   //prepare data for chart:
@@ -116,13 +123,13 @@ const Chart:React.FC <chartProps> = ({tableRows}) => {
     lineChartData.push(data?.data?.mtCumProduitLisse);
   }
 
-  const datesArray = data?.data?.labels;
+  const datesArray = data?.data?.labels ?? [];
 
   // Merge the arrays into an array of objects
   const mergedLineChartData = [["Days", "Charges", "Produits"]];
   const mergedBarChartData = [["Days", "Charges", "Produits"]];
 
-  datesArray.map((date: any, index: any) => {
+  datesArray?.map((date: any, index: any) => {
     mergedLineChartData.push([
       date,
       lineChartData[0][index],
@@ -131,13 +138,13 @@ const Chart:React.FC <chartProps> = ({tableRows}) => {
   });
 
   const CurChart = () => {
-    if (isCum) return <LineChart data={mergedLineChartData} />;
-    else return <BarChart data={mergedLineChartData} />;
+    if (isCum) return <LineChart data={mergedLineChartData ?? [] } />;
+    else return <BarChart data={mergedLineChartData ?? []} />;
   };
 
   return (
     <div className="  p-10 bg-white dark:bg-ion-dark rounded-3xl">
-      <ChartsHeader category="Line" title="Inflation Rate" />
+      <ChartsHeader title="BDG"  />
       <div className="w-full">
         <CurChart />
       </div>

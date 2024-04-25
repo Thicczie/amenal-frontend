@@ -1,14 +1,16 @@
 import React, { useEffect } from 'react'
 import { IonPage, IonHeader, IonToolbar, IonButtons, IonBackButton, IonTitle, IonContent, IonSegment, IonSegmentButton, IonLabel,  } from '@ionic/react'
 import { useHistory } from 'react-router'
-import InfoCard from '../components/InfoCard';
-import { getProjects } from '../api/api';
+import InfoCard from '../../components/InfoCard';
+import { getProjects } from '../../api/api';
 import { useQuery } from '@tanstack/react-query';
 import { Tab, Table } from '@mui/material';
-import useColumns from '../hooks/useColumns';
-import TableCard from '../components/TableCard';
-import { useAppContext } from '../contexts/AppContext';
-import { getFilteredDetailChargeTableByLotAndAvenant, getFilteredDetailChargeTableByLotAndProduitAndAvenant, getFilteredDetailChargeTableByProduitAndAvenant, getFilteredDetailChargeTableByTacheAndAvenant, getFilteredDetailDelaiTableByLotAndAvenant, getFilteredDetailDelaiTableByLotAndProduitAndAvenant, getFilteredDetailDelaiTableByProduitAndAvenant, getFilteredDetailDelaiTableByTacheAndAvenant, getFilteredDetailProduitTableByLotAndAvenant, getFilteredDetailProduitTableByLotAndProduitAndAvenant, getFilteredDetailProduitTableByProduitAndAvenant, getFilteredDetailProduitTableByTacheAndAvenant, getFilteredDetailQualiteTableByLotAndAvenant, getFilteredDetailQualiteTableByLotAndProduitAndAvenant, getFilteredDetailQualiteTableByProduitAndAvenant, getFilteredDetailQualiteTableByTacheAndAvenant } from '../api/detail_api';
+import useColumns from '../../hooks/useColumns';
+import TableCard from '../../components/TableCard';
+import { useAppContext } from '../../contexts/AppContext';
+import { getFilteredDetailChargeTableByLotAndAvenant, getFilteredDetailChargeTableByLotAndProduitAndAvenant, getFilteredDetailChargeTableByProduitAndAvenant, getFilteredDetailChargeTableByTacheAndAvenant, getFilteredDetailDelaiTableByLotAndAvenant, getFilteredDetailDelaiTableByLotAndProduitAndAvenant, getFilteredDetailDelaiTableByProduitAndAvenant, getFilteredDetailDelaiTableByTacheAndAvenant, getFilteredDetailProduitTableByLotAndAvenant, getFilteredDetailProduitTableByLotAndProduitAndAvenant, getFilteredDetailProduitTableByProduitAndAvenant, getFilteredDetailProduitTableByTacheAndAvenant, getFilteredDetailQualiteTableByLotAndAvenant, getFilteredDetailQualiteTableByLotAndProduitAndAvenant, getFilteredDetailQualiteTableByProduitAndAvenant, getFilteredDetailQualiteTableByTacheAndAvenant } from '../../api/detail_api';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+import BackButton from '../../components/BackButton';
 
 
 
@@ -16,17 +18,18 @@ import { getFilteredDetailChargeTableByLotAndAvenant, getFilteredDetailChargeTab
 const Details:React.FC = () => {
 
 
-const route = useHistory();
-const {currentTable , infoproduit , setInfoProduit , avenantId} = useAppContext();
-const { AllRowData ,displayedRowData , tableName="" }:any = useHistory().location.state ?? {};
+const route = useLocation();
+const navigate= useNavigate();
+const { infoproduit , setInfoProduit } = useAppContext();
+
+
+//const { AllRowData ,displayedRowData , tableName="" }:any = useHistory().location.state ?? {};
+const {  tableName , currentTable  , avenantId} :any=useParams();
+const {AllRowData}:any=route.state ?? {};
+
 const [rowId,setRowId]=React.useState<string|number|null>(null);
-
-
 const [currentDetailTable ,setCurrentDetailTable]=React.useState<string>("produits");
 const cardTitle:string = 'Détails'+' '+ currentDetailTable.charAt(0).toUpperCase() + currentDetailTable.slice(1);
-
-
-
 
 
 const filteredvalueschildren = AllRowData? Object.entries(AllRowData).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => value )[0]:[];
@@ -60,12 +63,13 @@ const handleContextMenuClick = (row:any) => {
      
   const rowchildren= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value)).map(([key, value]) => value )[0];
     if (currentTable=='produit') setInfoProduit({idproduit:row.original?.id,designationProduit:row.original?.designation})
-    if((rowchildren as any[])?.length > 0) {
+    //(rowchildren as any[])?.length > 0
+      if((rowchildren as any[])?.length > 0) {
 
       const tableName= Object.entries(row.original).filter(([key, value]) =>  Array.isArray(value))[0][0];
-      const newPathname = route.location.pathname === '/details' ? '/details2' : '/details';
-      route.push({ pathname: newPathname, state:{AllRowData:row.original,displayedRowData:row._valuesCache , tableName:tableName}});
-
+      const newPathname = route.pathname === 'details' ? 'details2' : 'details';
+    //  route.push({ pathname: newPathname, state:{AllRowData:row.original,displayedRowData:row._valuesCache , tableName:tableName}});
+      navigate(`../${newPathname}/${currentTable}/${tableName}`,{state:{AllRowData:row.original}});
 }
 }
 
@@ -275,6 +279,7 @@ const loadDelais = ( currentTable:string|null ,tableName:string ="none" ) => {
    <IonToolbar>
    <IonButtons slot='start'>
            <IonBackButton></IonBackButton>
+           <BackButton/>
        </IonButtons>
    <IonTitle >Détails</IonTitle>
 
@@ -290,6 +295,7 @@ const loadDelais = ( currentTable:string|null ,tableName:string ="none" ) => {
     data={filteredvalueschildren}
      columns={columns}
      onRowContextMenu={(row)=>{handleContextMenuClick(row)}}
+     tableName={currentTableName}
       />
 
 
@@ -312,10 +318,10 @@ const loadDelais = ( currentTable:string|null ,tableName:string ="none" ) => {
           </IonSegmentButton>
         </IonSegment>
 
-        {currentDetailTable =="produits" && <TableCard data={detailsproduits?.data} columns={detailProduitsColumns} isError={detailsproduits.isError} isPending={detailsproduits.isFetching} hideColumns={true} enableSeeAll={true}  title={cardTitle}  />}       
-        {currentDetailTable =="charges" && <TableCard data={detailscharges?.data} columns={detailChargesColumns} isError={detailscharges.isError} isPending={detailscharges.isFetching} hideColumns={true} enableSeeAll={true} title={cardTitle} enableFilterByCharge  />}
-        {currentDetailTable =="delais" && <TableCard data={detailsdelais?.data} columns={detailDelaisColumns} isError={detailsdelais.isError} isPending={detailsdelais.isFetching} enableSeeAll={true}  title={cardTitle} />}
-        {currentDetailTable =="qualites" && <TableCard data={detailsqualites?.data} columns={detailQualitesColumns} isError={detailsqualites.isError} isPending={detailsqualites.isFetching} hideColumns={true} enableSeeAll={true} title={cardTitle} />}
+        {currentDetailTable =="produits" && <TableCard tableName='detailProduit' data={detailsproduits?.data} columns={detailProduitsColumns} isError={detailsproduits.isError} isPending={detailsproduits.isFetching} hideColumns={true} enableSeeAll={true}  title={cardTitle}  />}       
+        {currentDetailTable =="charges" && <TableCard tableName='detailCharge' data={detailscharges?.data} columns={detailChargesColumns} isError={detailscharges.isError} isPending={detailscharges.isFetching} hideColumns={true} enableSeeAll={true} title={cardTitle} enableFilterByCharge  />}
+        {currentDetailTable =="delais" && <TableCard tableName='detailDelai' data={detailsdelais?.data} columns={detailDelaisColumns} isError={detailsdelais.isError} isPending={detailsdelais.isFetching} enableSeeAll={true}  title={cardTitle} />}
+        {currentDetailTable =="qualites" && <TableCard tableName='detailQualite' data={detailsqualites?.data} columns={detailQualitesColumns} isError={detailsqualites.isError} isPending={detailsqualites.isFetching} hideColumns={true} enableSeeAll={true} title={cardTitle} />}
     </IonContent>
  </IonPage>
   )

@@ -1,37 +1,55 @@
-import { Children, useEffect, useMemo } from 'react';
+import { Children, useEffect, useMemo } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
   MRT_Row,
-} from 'material-react-table';
+  MRT_EditActionButtons,
+} from "material-react-table";
 
-import { Button, Menu, MenuItem } from '@mui/material';
-import ButtonList from './buttonList';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import FileDownload  from '@mui/icons-material/FileDownload';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import UploadIcon from '@mui/icons-material/Upload';
+import {
+  Box,
+  Button,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
+import ButtonList from "./buttonList";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import FileDownload from "@mui/icons-material/FileDownload";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import UploadIcon from "@mui/icons-material/Upload";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { jsPDF } from "jspdf"; //or use your library of choice here
+import autoTable, { Row } from "jspdf-autotable";
+import { mkConfig, generateCsv, download } from "export-to-csv"; //or use your library of choice here
 
+import {
+  Directory,
+  Encoding,
+  Filesystem,
+  WriteFileOptions,
+  ReadFileOptions,
+} from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 
-import { jsPDF } from 'jspdf'; //or use your library of choice here
-import autoTable from  'jspdf-autotable'
-import { mkConfig, generateCsv, download } from 'export-to-csv' //or use your library of choice here
-
-
-import { Directory, Encoding, Filesystem , WriteFileOptions,ReadFileOptions } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
-
-import { getPlatforms } from '@ionic/react';
-import { useAppContext } from '../contexts/AppContext';
-import XLSXUpload from './xlsxUpload';
-import ReactDOM from 'react-dom';
-import React from 'react';
-import { useHistory } from 'react-router';
-import { Upload } from '@mui/icons-material';
-
-
-
+import { getPlatforms } from "@ionic/react";
+import { useAppContext } from "../contexts/AppContext";
+import XLSXUpload from "./xlsxUpload";
+import ReactDOM from "react-dom";
+import React from "react";
+import { useHistory } from "react-router";
+import { Upload } from "@mui/icons-material";
+import ModifyDialogButton from "./ModifyDialog";
+import { produitFields } from "../constants/FormFields";
+import DeleteDialogButton from "./DeleteDialogButton";
+import { useLongPress } from "../hooks/useLongPress";
+import { useNavigate } from "react-router-dom";
 
 interface TableProps {
   onRowClick: (rowData: any) => void; // Define prop for callback function
@@ -39,362 +57,401 @@ interface TableProps {
   data: any[];
   columns: MRT_ColumnDef<any>[];
   enableEditing: boolean;
-  hideColumns:boolean;
-  enableGraph?:boolean;
-  enableSeeAll?:boolean;
-  enableFilterByCharge?:boolean;  
+  hideColumns: boolean;
+  enableGraph?: boolean;
+  enableSeeAll?: boolean;
+  enableFilterByCharge?: boolean;
+  enableXlsxUpload?: boolean;
+  tableName: string;
 }
 
-
-
-
-
-
-const Table:React.FC <TableProps> = ({onRowClick , onRowContextMenu=()=>{} ,data , columns , enableEditing=false ,hideColumns=false , enableGraph=false , enableSeeAll=false , enableFilterByCharge=false}) => {
-
+const Table: React.FC<TableProps> = ({
+  onRowClick,
+  onRowContextMenu = null,
+  data,
+  columns,
+  enableEditing = false,
+  hideColumns = false,
+  enableGraph = false,
+  enableSeeAll = false,
+  enableFilterByCharge = false,
+  enableXlsxUpload = true,
+  tableName,
+}) => {
   const [contextMenu, setContextMenu] = React.useState<{
     mouseX: number;
     mouseY: number;
     row?: MRT_Row<any>;
   } | null>(null);
 
-  const [actionMenuAnchorEl, setActionMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-  const actionMenuOpen=Boolean(actionMenuAnchorEl);
-  const {currentCharge,setCurrentCharge}=useAppContext();
-  
-  const onFilterByCharge = (row: MRT_Row<any> | undefined ) => {
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] =
+    React.useState<null | HTMLElement>(null);
+  const [crudMenuAcnhorEl, setcrudMenuAcnhorEl] =
+    React.useState<null | HTMLElement>(null);
+  const actionMenuOpen = Boolean(actionMenuAnchorEl);
+  const crudMenuOpen = Boolean(crudMenuAcnhorEl);
+  const { currentCharge, setCurrentCharge } = useAppContext();
+
+  const onFilterByCharge = (row: MRT_Row<any> | undefined) => {
     //console.log('onFilterByCharge', row?.original?.charge);
-    
-   setCurrentCharge(row?.original?.charge);
-  } 
-  
-  const handleActionMenuClick = (event:any) => {
+
+    setCurrentCharge(row?.original?.charge);
+  };
+
+  const handleActionMenuClick = (event: any) => {
     setActionMenuAnchorEl(event?.currentTarget);
   };
-  
-  const handleActionMenuClose=()=>{
+
+  const handleActionMenuClose = () => {
     setActionMenuAnchorEl(null);
-  }
+  };
 
-  const route = useHistory();
+  const handleCrudMenuClick = (event: any) => {
+    setcrudMenuAcnhorEl(event?.currentTarget);
+  };
+  const handleCrudMenuClose = () => {
+    setcrudMenuAcnhorEl(null);
+  };
 
-  const handleVoirToutClick = (event:any) => {
-    event.preventDefault();    
-    route.push('/AllDetails');
+  const navigate = useNavigate();
+  const handleVoirToutClick = (event: any) => {
+    event.preventDefault();
+    navigate("allDetails");
+  };
 
-  }
-
-  const handleExportRowsPdf =async (rows: MRT_Row<any>[]) => {
+  const handleExportRowsPdf = async (rows: MRT_Row<any>[]) => {
     const doc = new jsPDF();
-    const tableData :any[] = rows.map((row) => Object.values(row.original));
+    const tableData: any[] = rows.map((row) => Object.values(row.original));
     const tableHeaders = columns.map((c) => c.header);
-
 
     autoTable(doc, {
       head: [tableHeaders],
       body: tableData,
     });
-    const docBlob = doc.output()
-
-
-
+    const docBlob = doc.output();
 
     const options: WriteFileOptions = {
-      path: 'Table.pdf',
-      data: docBlob, 
-      directory:Directory.Cache,
-      encoding: Encoding.UTF8
-    }
-  //get the file
+      path: "Table.pdf",
+      data: docBlob,
+      directory: Directory.Cache,
+      encoding: Encoding.UTF8,
+    };
+    //get the file
 
-
-   if ((getPlatforms() as string[])?.includes('desktop')) {
-    doc.save('Table.pdf');
-    }else {
-
+    if ((getPlatforms() as string[])?.includes("desktop")) {
+      doc.save("Table.pdf");
+    } else {
       try {
-        const writenFile = await Filesystem.writeFile(options).then((result) => {return result});
-        const fileContent = await Filesystem.readFile(options).then((result) => {return result});
+        const writenFile = await Filesystem.writeFile(options).then(
+          (result) => {
+            return result;
+          }
+        );
+        const fileContent = await Filesystem.readFile(options).then(
+          (result) => {
+            return result;
+          }
+        );
 
+        console.log("PDF file written to:", fileContent);
 
-
-
-        console.log('PDF file written to:', fileContent);
-
-        
         const shareResult = await Share.share({
-          title: 'Export as PDF',
+          title: "Export as PDF",
           url: writenFile?.uri,
-          dialogTitle: 'Share PDF file'
+          dialogTitle: "Share PDF file",
         });
-        
       } catch (error) {
-        
-        console.log('Unable to share PDF file:', error);
-        
+        console.log("Unable to share PDF file:", error);
       }
- 
-
-  
-
-
-}
-
-    
+    }
   };
 
   // Define the CSV configuration
   const csvConfig = mkConfig({
-    fieldSeparator: ',',
-    decimalSeparator: '.',
+    fieldSeparator: ",",
+    decimalSeparator: ".",
     useKeysAsHeaders: true,
   });
 
-
-// handle export to csv
+  // handle export to csv
   const handleExportRowsCsv = async (rows: MRT_Row<any>[]) => {
     const rowData = rows.map((row) => row.original);
     const csv = generateCsv(csvConfig)(rowData);
-    
-  
+
     try {
       // Write CSV data to a temporary file
-      const fileName = 'exported_data.csv';
+      const fileName = "exported_data.csv";
 
       const options: WriteFileOptions = {
         path: fileName,
         data: csv.toString(), // Convert csv to string
-        directory:Directory.Cache,
-        encoding: Encoding.UTF8
+        directory: Directory.Cache,
+        encoding: Encoding.UTF8,
+      };
+      //get the file
+      const writenFile = await Filesystem.writeFile(options).then((result) => {
+        return result;
+      });
+
+      if ((getPlatforms() as string[])?.includes("desktop")) {
+        download(csvConfig)(csv);
+      } else {
+        // Share the file with the user
+        const shareResult = await Share.share({
+          title: "Export as Csv",
+          url: writenFile?.uri,
+          dialogTitle: "Share CSV file",
+        });
       }
-    //get the file
-    const writenFile = await Filesystem.writeFile(options).then((result) => {return result});
-
-
-  
-
-    if ((getPlatforms() as string[])?.includes('desktop')) {
-      download(csvConfig)(csv);
-    }else {
-
-  // Share the file with the user
-  const shareResult = await Share.share({
-    title: 'Export as Csv',
-    url: writenFile?.uri,
-    dialogTitle: 'Share CSV file'
-  });
-
-    }
-    //   console.log('CSV file shared successfully!');
+      //   console.log('CSV file shared successfully!');
     } catch (error) {
-      console.error('Unable to share CSV file:', error);
-      alert('export error: '+ (error as any )?.message);
+      console.error("Unable to share CSV file:", error);
+      alert("export error: " + (error as any)?.message);
     }
   };
 
+  const onLongPress = (event: React.TouchEvent<any>, row: MRT_Row<any>) => {
+    console.log("Long press detected.", event, row);
+    event.preventDefault();
+    setContextMenu(
+      contextMenu === null
+        ? {
+            mouseX: event.touches[0].clientX + 2,
+            mouseY: event.touches[0].clientY - 6,
+            row: row,
+          }
+        : null
+    );
+  };
 
   const [selectedRow, setSelectedRow] = React.useState<MRT_Row<any>>();
-  const xlsxButtonRef= React.useRef<any>();
+  const xlsxButtonRef = React.useRef<any>();
 
   // Define the table instance using the useMaterialReactTable hook
   const table = useMaterialReactTable({
     columns,
     data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
     enableColumnResizing: true,
-    enablePagination:true,
-    enableFullScreenToggle:false,
-    enableStickyHeader:true,
-    enableEditing:enableEditing,
-    enableDensityToggle:false,
-    enableRowActions:true,
+    enablePagination: true,
+    enableFullScreenToggle: false,
+    enableStickyHeader: true,
+    enableEditing: enableEditing,
+    enableDensityToggle: false,
+    enableRowActions: true,
 
-    initialState:{   
-      columnVisibility:{
-        'id':false, //hide id on displayed table
-        'produitId':false,
-        'lotId':false,
-        'activiteId':false,
-        'ordre':!hideColumns,  // hides unwanted columns
-        'produit':!hideColumns,
-        'lot':!hideColumns,
-        'activite':!hideColumns,
-        'upb':!hideColumns,
+    initialState: {
+      columnVisibility: {
+        id: false, //hide id on displayed table
+        produitId: false,
+        lotId: false,
+        activiteId: false,
+        ordre: !hideColumns, // hides unwanted columns
+        produit: !hideColumns,
+        lot: !hideColumns,
+        activite: !hideColumns,
+        upb: !hideColumns,
       },
-    
-      density:'compact',
+
+      density: "compact",
     },
 
-    onEditingRowSave: ({ table, values  }) => {
+    onEditingRowSave: ({ table, values }) => {
       //validate data
       //save data to api
 
-      console.log('onEditingRowSave', values);
-
+      console.log("onEditingRowSave", values);
 
       table.setEditingRow(null); //exit editing mode
     },
+    renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
+      <ModifyDialogButton currentForm={tableName} table={table} row={row} />
+    ),
+    // renderRowActions: ({ row, table }) => (
+
+    //   <Tooltip title='actions'>
+    //     <>
+    //    <IconButton
+    //       className='p-2'
+
+    //       //export all rows, including from the next page, (still respects filtering and sorting)
+    //       onClick={(e) =>
+    //         handleCrudMenuClick(e)
+    //       }
+    //     >
+    //       <MoreHorizIcon/>
+    //     </IconButton>
+    //      <Menu open={crudMenuOpen}
+    //      anchorEl={crudMenuAcnhorEl}
+    //       onClose={handleCrudMenuClose}
+    //      >
+    //       <MenuItem className=' gap-2' onClick={()=>{table.setEditingRow(row); handleCrudMenuClose()}}><EditIcon/>Modifier</MenuItem>
+    //       <MenuItem className='gap-2'><DeleteIcon/><DeleteDialogButton handleCrudMenuClose={handleCrudMenuClose} currentTable={tableName}/></MenuItem>
+    //       </Menu>
+    //     </>
+    //   </Tooltip>
+    // ),
+
     renderTopToolbarCustomActions: ({ table }) => {
-    return (
-      <>
-   <div className=" flex flex-row">
+      return (
+        <>
+          <div className=" flex flex-row">
+            <button
+              className="p-2"
+              //export all rows, including from the next page, (still respects filtering and sorting)
+              onClick={(e) => handleActionMenuClick(e)}
+            >
+              <MoreHorizIcon />
+            </button>
 
-        <button
-          className='p-2'
-          
-          //export all rows, including from the next page, (still respects filtering and sorting)
-          onClick={(e) =>
-            handleActionMenuClick(e)
-          } 
-        >
-          <MoreHorizIcon/>
-        </button>
+            <Menu
+              open={actionMenuOpen}
+              anchorEl={actionMenuAnchorEl}
+              onClose={handleActionMenuClose}
+            >
+              <MenuItem
+                disabled={table.getPrePaginationRowModel().rows.length === 0}
+                className="p-2"
+                onClick={() => {
+                  handleExportRowsPdf(table.getRowModel().rows);
+                  handleActionMenuClose();
+                }}
+              >
+                <PictureAsPdfIcon />
+                Exporter Pdf
+              </MenuItem>
+              <MenuItem
+                className="p-2"
+                disabled={table.getPrePaginationRowModel().rows.length === 0}
+                //export all rows, including from the next page, (still respects filtering and sorting)
+                onClick={() => {
+                  handleExportRowsCsv(table.getPrePaginationRowModel().rows);
+                  handleActionMenuClose();
+                }}
+              >
+                <FileDownload />
+                Exporter Excel
+              </MenuItem>
 
-          <Menu
-          open={actionMenuOpen}
-          anchorEl={actionMenuAnchorEl}
-          onClose={handleActionMenuClose}
-
-          >
-            <MenuItem
-                      
-                          disabled={table.getPrePaginationRowModel().rows.length === 0}
-                          className='p-2'
-                          onClick={() =>
-                            {handleExportRowsPdf(table.getRowModel().rows);
-                            handleActionMenuClose();
-                            }
-                            
-                          }
-                        >
-                          <PictureAsPdfIcon/>
-                        
-                          Exporter Pdf
-                          
-            </MenuItem>
-            <MenuItem 
-                            
-                          className='p-2'
-                          disabled={table.getPrePaginationRowModel().rows.length === 0}
-                          //export all rows, including from the next page, (still respects filtering and sorting)
-                          onClick={() =>
-                            {handleExportRowsCsv(table.getPrePaginationRowModel().rows);
-                              handleActionMenuClose();
-                            }
-                          } 
-                        >
-                          <FileDownload/>
-                      
-                      Exporter Excel
-            </MenuItem>
-
-
-                <MenuItem onClick={()=>
-                  {
-                  handleActionMenuClose();  
+              <MenuItem
+                onClick={() => {
+                  handleActionMenuClose();
                   xlsxButtonRef.current?.showModal();
-                  } 
-                  }>  
-                          <UploadIcon/>
-                          Importer Excel
-                </MenuItem>
-                
-           
-           
+                }}
+                disabled={!enableXlsxUpload}
+              >
+                <UploadIcon />
+                Importer Excel
+              </MenuItem>
 
-            <MenuItem
-            disabled={!enableSeeAll}
-            onClick={(e)=>{handleVoirToutClick(e);
-                           handleActionMenuClose();  
-            }}  >
+              <MenuItem
+                disabled={!enableSeeAll}
+                onClick={(e) => {
+                  handleVoirToutClick(e);
+                  handleActionMenuClose();
+                }}
+              >
                 Voir Tout
-            </MenuItem>
+              </MenuItem>
+            </Menu>
 
-          </Menu>
+            {enableXlsxUpload && <XLSXUpload buttonRef={xlsxButtonRef} />}
 
-          <XLSXUpload buttonRef={xlsxButtonRef}/>
+            {enableGraph && <ButtonList table={table} />}
+          </div>
+        </>
+      );
+    },
 
-         { enableGraph &&  <ButtonList table={table} />}
+    muiTableBodyRowProps: ({ row, table }) => {
+      const longPressProps = useLongPress((event: React.TouchEvent) =>
+        onLongPress(event, row)
+      );
 
-
-         </div>
-    
-
-          </>
-
-          
-    );
- 
-
-
-},
-
-   
-    muiTableBodyRowProps: ({ row ,table }) => ({
-      onClick: (event) => {
-
-          setSelectedRow(row); // Set the selected row to highlight it
-          onRowClick(row); // Call the callback function with the row data
-          
-
-      },
-      onContextMenu: (event) => {
-      event.preventDefault();
-
-      
-      setContextMenu(
-        contextMenu === null
-          ? {
-              mouseX: event.clientX + 2,
-              mouseY: event.clientY - 6,
-              row: row,
-            }
-          : null,
-         
-      );      
-      
-      },
-      
-      sx: {
-        cursor: 'pointer', //you might want to change the cursor too when adding an onClick
-        backgroundColor: row === selectedRow ? 'rgba(0,0,0,0.1)' : undefined, // Change the background color if the row is selected
-        border : row.original?.charge && row.original?.charge === currentCharge ? '1px solid #3880ff' : undefined,
-      },      
-    }),
-    
-
-
+      return {
+        ...longPressProps,
+        onClick: (event) => {
+          event.preventDefault();
+          setSelectedRow(row);
+          onRowClick(row);
+        },
+        onContextMenu: (event) => {
+          event.preventDefault();
+          setContextMenu(
+            contextMenu === null
+              ? {
+                  mouseX: event.clientX + 2,
+                  mouseY: event.clientY - 6,
+                  row: row,
+                }
+              : null
+          );
+        },
+        sx: {
+          cursor: "pointer", //you might want to change the cursor too when adding an onClick
+          backgroundColor: row === selectedRow ? "rgba(0,0,0,0.1)" : undefined, // Change the background color if the row is selected
+          border:
+            row.original?.charge && row.original?.charge === currentCharge
+              ? "1px solid #3880ff"
+              : undefined,
+        },
+      };
+    },
     muiTableBodyCellProps: ({ cell }) => {
-      if(typeof cell.getValue() ==='boolean'){
-        return  {children : cell.getValue() ? 'OUI':'NON'}
-      }else{
-        return {children : undefined}
+      if (typeof cell.getValue() === "boolean") {
+        return { children: cell.getValue() ? "OUI" : "NON" };
+      } else {
+        return { children: undefined };
       }
-    }
+    },
   });
 
-  return<>
-    {contextMenu && ReactDOM.createPortal(
+  return (
+    <>
+      {contextMenu &&
+        ReactDOM.createPortal(
+          <Menu
+            open={true}
+            anchorReference="anchorPosition"
+            anchorPosition={
+              contextMenu !== null
+                ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                : undefined
+            }
+            onClose={() => setContextMenu(null)}
+          >
+            {onRowContextMenu && (
+              <MenuItem
+                onClick={() => {
+                  onRowContextMenu(contextMenu?.row);
+                  setContextMenu(null);
+                }}
+              >
+                Voir Détails
+              </MenuItem>
+            )}
 
-<Menu
-open={true}
-anchorReference='anchorPosition'
-anchorPosition={
-  contextMenu !== null
-  ? { top: contextMenu.mouseY, left: contextMenu.mouseX } 
-     : undefined
-}
-onClose={()=>setContextMenu(null)}
+            <DeleteDialogButton
+              onClose={() => setContextMenu(null)}
+              handleCrudMenuClose={handleCrudMenuClose}
+              currentTable={tableName}
+            />
 
->
-<MenuItem onClick={()=>{ onRowContextMenu(contextMenu?.row) ; setContextMenu(null)  }}>Voir Détails</MenuItem>
-{enableFilterByCharge && <MenuItem onClick={()=>{ onFilterByCharge(contextMenu?.row) ; setContextMenu(null)  }}>Filtrer par Charge</MenuItem>}
-
-</Menu>
-,document.body) }
-   <MaterialReactTable  table={table} />
-  
-  </>
-  ;
+            {enableFilterByCharge && (
+              <MenuItem
+                onClick={() => {
+                  onFilterByCharge(contextMenu?.row);
+                  setContextMenu(null);
+                }}
+              >
+                Filtrer par Charge
+              </MenuItem>
+            )}
+          </Menu>,
+          document.body
+        )}
+      <MaterialReactTable table={table} />
+    </>
+  );
 };
 
 export default Table;

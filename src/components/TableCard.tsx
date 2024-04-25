@@ -22,10 +22,13 @@ interface InfoCardProps {
     enableFilterByCharge?:boolean;
     showFilteredBy?:boolean;
     HeaderContent?:JSX.Element;
+    enableXlsxUpload?:boolean;
+    tableName:string;
+    
 
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({  
+const TableCard: React.FC<InfoCardProps> = ({  
   handleRwoClick=()=>{},
    onRowContextMenu ,
     columns,data , isError,isPending  ,
@@ -33,7 +36,9 @@ const InfoCard: React.FC<InfoCardProps> = ({
     title ,
     hideColumns=false ,
     enableGraph=false ,enableSeeAll , enableFilterByCharge,showFilteredBy=false,
-    HeaderContent
+    HeaderContent,
+    enableXlsxUpload,
+    tableName
   }) => {
   const{ currentCharge ,setCurrentCharge}=useAppContext();  
   return (
@@ -59,7 +64,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 
           {data ?  
             <Table enableEditing={enableEditing} 
-             data={data?.data ? data.data : data  as []}
+             data={data?.data ?? data  as [] }
               columns={columns}
                onRowClick={handleRwoClick}
                onRowContextMenu={onRowContextMenu}
@@ -67,6 +72,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
                  enableGraph={enableGraph}
                  enableSeeAll={enableSeeAll}
                   enableFilterByCharge={enableFilterByCharge}
+                  enableXlsxUpload={enableXlsxUpload}
+                  tableName={tableName}
                  />
 
           :isPending ?<IonSpinner name="crescent"/>
@@ -78,4 +85,4 @@ const InfoCard: React.FC<InfoCardProps> = ({
     );
 };
 
-export default InfoCard;
+export default TableCard;

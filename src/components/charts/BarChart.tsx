@@ -7,7 +7,7 @@ interface BarChartProps {
 const options = {
    
     bars: "vertical", // Required for Material Bar Charts.
-backgroundColor:"#f4d774",
+    backgroundColor:"#f4d774",
 
 
 
