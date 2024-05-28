@@ -243,9 +243,9 @@ export const getFilteredDetailDelaiTableByActivitePrincipaleAndAvenant = (tacheI
 
 
 //save Details Attente
-export const saveAllDetailProduitAttentes = async (detailProduitAttentes) => {
+export const saveAllDetailProduitAttentes = async (detailProduitAttentes, onUploadProgress) => {
     try {
-        const response = await apiClient.post(`/detailProduitAttentes/addAll`, detailProduitAttentes);
+        const response = await apiClient.post(`/detailProduitAttentes/addAll`, detailProduitAttentes, { onUploadProgress: progressEvent => onUploadProgress(progressEvent, 'detailProduit') });
         return response;
     } catch (error) {
         console.error('Error saving DetailProduitAttentes:', error);
@@ -253,9 +253,9 @@ export const saveAllDetailProduitAttentes = async (detailProduitAttentes) => {
     }
 };
 
-export const saveAllDetailChargeAttentes = async (detailChargeAttentes) => {
+export const saveAllDetailChargeAttentes = async (detailChargeAttentes, onUploadProgress) => {
     try {
-        const response = await apiClient.post(`/detailChargeAttentes/addAll`, detailChargeAttentes);
+        const response = await apiClient.post(`/detailChargeAttentes/addAll`, detailChargeAttentes, { onUploadProgress: progressEvent => onUploadProgress(progressEvent, 'detailCharge') });
         return response;
     } catch (error) {
         console.error('Error saving DetailChargeAttentes:', error);
@@ -263,9 +263,9 @@ export const saveAllDetailChargeAttentes = async (detailChargeAttentes) => {
     }
 };
 
-export const saveAllDetailDelaiAttentes = async (detailDelaiAttentes) => {
+export const saveAllDetailDelaiAttentes = async (detailDelaiAttentes, onUploadProgress) => {
     try {
-        const response = await apiClient.post(`/detailDelaiAttentes/addAll`, detailDelaiAttentes);
+        const response = await apiClient.post(`/detailDelaiAttentes/addAll`, detailDelaiAttentes, { onUploadProgress: progressEvent => onUploadProgress(progressEvent, 'detailDelai') });
         return response;
     } catch (error) {
         console.error('Error saving DetailDelaiAttentes:', error);
@@ -273,9 +273,9 @@ export const saveAllDetailDelaiAttentes = async (detailDelaiAttentes) => {
     }
 };
 
-export const saveAllDetailQualiteAttentes = async (detailQualiteAttentes) => {
+export const saveAllDetailQualiteAttentes = async (detailQualiteAttentes, onUploadProgress) => {
     try {
-        const response = await apiClient.post(`/detailQualiteAttentes/addAll`, detailQualiteAttentes);
+        const response = await apiClient.post(`/detailQualiteAttentes/addAll`, detailQualiteAttentes, { onUploadProgress: progressEvent => onUploadProgress(progressEvent, 'detailQualite') });
         return response;
     } catch (error) {
         console.error('Error saving DetailQualiteAttentes:', error);

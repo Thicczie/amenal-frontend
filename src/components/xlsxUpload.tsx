@@ -1,4 +1,4 @@
-import React, { useState, useRef, useImperativeHandle } from "react";
+import React, { useState, useRef, useImperativeHandle, useEffect } from "react";
 
 import {
   getMetresByAvenantId,
@@ -44,7 +44,7 @@ import {
   detailDelaiFields,
   detailQualiteFields,
 } from "../constants/FormFields";
-import { MenuItem } from "@mui/material";
+import { LinearProgress, MenuItem } from "@mui/material";
 import CheckboxSelectionModal from "./CheckboxSelectionModal";
 import {
   getDetailChargeAttentesByAvenantId,
@@ -57,8 +57,9 @@ import {
   saveAllDetailQualiteAttentes,
 } from "../api/detail_api";
 import { AssignmentReturnTwoTone } from "@mui/icons-material";
-import { Bounce, ToastContainer, toast } from "react-toastify";
 import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
+import toast from "react-hot-toast";
 
 interface XLSXUploadProps {
   handleCloseMenu?: () => void;
@@ -109,7 +110,7 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
   const mutation = useMutation({
     mutationFn: (variables: { data: any[]; currentTable: string }) =>
       HandleMutate(variables.currentTable, variables.data),
-    onMutate: async () => {
+    onMutate: () => {
       // const id =toast.loading("Importation en cours ...");
       // toast.update(id, { render: "All is good", type: "success", isLoading: false });
 
@@ -154,29 +155,28 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
     }
   };
 
-  const SaveAttente = async (data: any, currentDetailTable: string) => {
-    switch (currentDetailTable) {
-      case "Charges":
-        return saveAllDetailChargeAttentes(data);
-
-        break;
-      case "Produits":
-        return saveAllDetailProduitAttentes(data);
-
-        break;
-      case "Délais":
-        return saveAllDetailDelaiAttentes(data);
-
-        break;
-
-      case "Qualités":
-        return saveAllDetailQualiteAttentes(data);
-
-        break;
-
-      default:
-        break;
-    }
+  // progress bar toast callback
+  const onUploadProgress = (progressEvent: any, element: string) => {
+    console.log(
+      "progress",
+      element,
+      progressEvent.loaded / progressEvent.total
+    );
+    const toastex = toast(
+      (t) => (
+        <div>
+          <div>Importation {element} ...</div>
+          <div>
+            {/* {Math.round((progressEvent.loaded / progressEvent.total) * 100)}% */}
+            <LinearProgress
+              variant="determinate"
+              value={(progressEvent.loaded / progressEvent.total) * 100}
+            />
+          </div>
+        </div>
+      ),
+      { duration: 100000000, id: element }
+    );
   };
 
   // use mutation mutate function
@@ -192,62 +192,65 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
         return saveAllTaches(data);
       }
       case "detailProduit": {
-        return SaveAttente(data, "Produits");
+        return saveAllDetailProduitAttentes(data, onUploadProgress);
       }
       case "detailCharge": {
-        return SaveAttente(data, "Charges");
+        return saveAllDetailChargeAttentes(data, onUploadProgress);
       }
       case "detailDelai": {
-        return SaveAttente(data, "Délais");
+        return saveAllDetailDelaiAttentes(data, onUploadProgress);
       }
       case "detailQualite": {
-        return SaveAttente(data, "Qualités");
+        return saveAllDetailQualiteAttentes(data, onUploadProgress);
       }
 
       default:
         console.log("no table selected");
+        alert("aucune table selectionnée");
         break;
     }
   };
 
   //show dialog with errors or success message
-  const showSettledDialog = () => {
-    if (BadReqArray.length > 0) {
-      Dialog.alert({
-        title: "Erreur",
-        message:
-          "Erreur de requête pour \n" +
-          BadReqArray.map(
-            (item: any) =>
-              Object.entries(item)
-                .slice(0, 2)
-                .map(([key, val]: any) => key + " : " + val)
-                .join(",    ") + "\n"
-          ),
-      });
-      setBadReqArray([]);
-    }
-    if (DuplicatesArray.length > 0) {
-      Dialog.alert({
-        title: "Erreur",
-        message:
-          "Doublons détectés pour \n " +
-          DuplicatesArray.map(
-            (item: any) =>
-              Object.entries(item)
-                .slice(0, 2)
-                .map(([key, val]: any) => key + " : " + val)
-                .join(",    ") + "\n"
-          ),
-      });
-      setDuplicatesArray([]);
-    }
-    if (BadReqArray.length == 0 && DuplicatesArray.length == 0) {
-      Dialog.alert({
-        title: "Succès",
-        message: "Importation réussie",
-      });
-    }
+  const showSettledDialog = (element: string) => {
+    // if (BadReqArray.length > 0) {
+    //   Dialog.alert({
+    //     title: "Erreur",
+    //     message:
+    //       "Erreur de requête pour \n" +
+    //       BadReqArray.map(
+    //         (item: any) =>
+    //           Object.entries(item)
+    //             .slice(0, 2)
+    //             .map(([key, val]: any) => key + " : " + val)
+    //             .join(",    ") + "\n"
+    //       ),
+    //   });
+    //   setBadReqArray([]);
+    // }
+    // if (DuplicatesArray.length > 0) {
+    //   Dialog.alert({
+    //     title: "Erreur",
+    //     message:
+    //       "Doublons détectés pour \n " +
+    //       DuplicatesArray.map(
+    //         (item: any) =>
+    //           Object.entries(item)
+    //             .slice(0, 2)
+    //             .map(([key, val]: any) => key + " : " + val)
+    //             .join(",    ") + "\n"
+    //       ),
+    //   });
+    //   setDuplicatesArray([]);
+    // }
+    // if (BadReqArray.length == 0 && DuplicatesArray.length == 0) {
+    //   Dialog.alert({
+    //     title: "Succès",
+    //     message: "Importation réussie",
+    //   });
+    //   }
+
+    toast.success(element + " importé(e)s ", { id: element, duration: 0 });
   };
 
   // Function to rename array keys to match specifications
@@ -332,8 +335,6 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
           ],
         });
 
-        console.log("file", file.files[0].name);
-
         if (file?.files[0]) {
           const uri = file.files[0].path;
           const filename = file.files[0].name;
@@ -405,7 +406,7 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
 
         mutation
           .mutateAsync({ data: data, currentTable: currentTable })
-          .then(() => showSettledDialog());
+          .then(() => showSettledDialog("produit"));
 
         break;
       }
@@ -423,7 +424,7 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
 
         mutation
           .mutateAsync({ data: data, currentTable: currentTable })
-          .then(() => showSettledDialog());
+          .then(() => showSettledDialog("lot"));
 
         break;
       }
@@ -449,25 +450,25 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
       case "detailProduit": {
         mutation
           .mutateAsync({ data: data, currentTable: "detailProduit" })
-          .then(() => showSettledDialog());
+          .then(() => showSettledDialog("detailProduit"));
         break;
       }
       case "detailCharge": {
         mutation
           .mutateAsync({ data: data, currentTable: "detailCharge" })
-          .then(() => showSettledDialog());
+          .then(() => showSettledDialog("detailCharge"));
         break;
       }
       case "detailDelai": {
         mutation
           .mutateAsync({ data: data, currentTable: "detailDelai" })
-          .then(() => showSettledDialog());
+          .then(() => showSettledDialog("detailDelai"));
         break;
       }
       case "detailQualite": {
         mutation
           .mutateAsync({ data: data, currentTable: "detailQualite" })
-          .then(() => showSettledDialog());
+          .then(() => showSettledDialog("detailQualite"));
         break;
       }
       default:
@@ -522,7 +523,6 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
                   (item: any) => item?.id == metreid
                 )[0];
               }
-              console.log("uploading det prod ", detailsprod);
 
               return Upload(detailsprod, "detailProduit");
             }
@@ -560,10 +560,7 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
               alert("Attente trouvés pour les délais , veuillez les valider ");
               return;
             } else {
-              console.log("uploading detail delai ...");
-
               let metreid = selectedMetre.current;
-              console.log("sheet", uploadedExcel[sheetName]);
 
               const detailsdelais = renameKeys(
                 uploadedExcel[sheetName],
@@ -587,8 +584,6 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
               return;
             } else {
               let metreid = selectedMetre.current;
-
-              console.log("uploading detail qualité");
 
               const detailsqualite = renameKeys(
                 uploadedExcel[sheetName],
@@ -646,8 +641,6 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
     {
       text: "Confirm",
       handler: (value: any) => {
-        console.log("value", value);
-
         setMetreModal(false);
         onConfirm(value);
       },
@@ -665,6 +658,8 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
     //CheckboxSelectionModal(sheetNames).then((checkedSheets:any)=> { handleUpload(jsonData ,checkedSheets)});
     const checkedSheets = await CheckboxSelectionModal(sheetNames);
     if (checkedSheets?.length > 0) handleUpload(jsonData, checkedSheets);
+    // toast("okex");
+    // toast("toastexx");
   };
 
   return (

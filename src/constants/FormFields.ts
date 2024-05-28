@@ -1,49 +1,21 @@
-import { getBanques, getBesoins, getChargeStandards, getDeviss, getFactures, getFournisseurs, getPaiements, getRemises, getTransports } from "../api/achat/achat_api";
-import { getProjects, getTaches } from "../api/api";
+import { getBanques, getBesoins, getChargeStandards, getDeviss, getFactures, getFournisseurs, getPaiements, getReceptions, getRemises, getTransports } from "../api/achat/achat_api";
+import { getClients, getProjects, getResponsables, getTaches } from "../api/api";
 import { getLotsByProjectId, getMetresByAvenantId, getProduitsByAvenantId } from "../api/crudAPI";
 
-
+ // field object used for crud forms , and excel upload , contains layout and field info and other details
 export type Fields = {
     [key: string]: {
-        label: string,
-        column: string,
-        type: string,
-        required: boolean,
-        queryFct?: (...args:any|undefined) => Promise<any>;
-        queryArg?: any;
-        selectLabel?: string;
-        foreignKey?: string;
+        label: string, // label of the field
+        column: string, // column name in the database
+        type: string, // type of the field
+        required: boolean, // is the field required
+        queryFct?: (...args:any|undefined) => Promise<any>; // function to get the data for the select field
+        queryArg?: any; // argument to pass to the query function
+        selectLabel?: string; // label to display in the select field
+        foreignKey?: string; // foreign key to use in the select field
         
     }
 }
-
-// const produitFields:Fields = {
-//     article: { label: "ART", column: "art", type: "text", required: false },
-//     designation: { label: "DESIGNATION", column: "designation", type: "text", required: true },
-//     unite: { label: "UNITE", column: "upb", type: "text", required: false },
-//     qteRef: { label: "QUANTITE", column: "qpm", type: "number", required: false },
-//     puRef: { label: "PU", column: "ppm", type: "number", required: false },
-//     metre: { label: "METRE", column: "metre", type: "select",selectLabel:"titre",queryArg:"avenantId", queryFct: (avenantId:any) => getMetresByAvenantId(avenantId), required: true },
-// };
-
-// const lotFields:Fields = {
-
-//     article: { label: 'ORD', column: "article", type: "text", required: false },
-//     designation: { label: 'LOT', column: "designation", type: "text", required: false },
-//     project: { label: 'PROJET', column: "projet", type: "select",selectLabel:'project',queryArg:undefined, queryFct: getProjects, required: true }
-
-// };
-
-// const tacheFields:Fields = {
-//     ordre: { label: 'ORD', column: "ordre", type: "text", required: false },
-//     produit: { label: 'PRODUIT', column: "produit", type: "select",selectLabel:"designation", queryArg:"avenantId", queryFct:(avenantId:any)=> getProduitsByAvenantId(avenantId), required: true },
-//     lot: { label: 'LOT', column: "lot", type: "select",selectLabel:"designation",  queryArg:"projectId", queryFct:(projectId) =>getLotsByProjectId(projectId), required: true },
-//     titreActivite: { label: 'ACTIVITE', column: "activite", type: "text", required: true },
-//     cleAttachement: { label: 'CLE', column: "c", type: "boolean", required: true },
-//     unite: { label: 'UNT', column: "upb", type: "text", required: false },
-//     dateDebut: { label: 'DATE DEBUT', column: "ddb", type: "date", required: true },
-//     delai: { label: 'DELAI', column: "dlb", type: "number", required: false }
-// };
 
 const produitFields:Fields = {
     art: { label: "ART", column: "art", type: "text", required: false },
@@ -58,8 +30,8 @@ const lotFields:Fields = {
 
     ordre: { label: 'ORD', column: "article", type: "text", required: false },
     designation: { label: 'LOT', column: "designation", type: "text", required: false },
-    project: { label: 'PROJET', column: "projet", type: "select",selectLabel:'project',queryArg:undefined, queryFct: getProjects, required: true }
-
+    project: { label: 'PROJET', column: "projet", type: "select",selectLabel:'project',queryArg:undefined, queryFct: getProjects, required: true },
+    okex :{ label: 'OKEX', column: "okex", type: "boolean", required: false , queryFct:getBanques,  }
 };
 
 const tacheFields:Fields = {
@@ -74,10 +46,6 @@ const tacheFields:Fields = {
 };
 
 
-
-// DESIGNATION	LOT	ACTIVITE	UNT	CLE	DETAIL PRODUIT	NBR	DM1	DM2	DM3	RSL
-
-// ordre	produit	lot	activite	upb	cle	reference	nbr	dim1	dim2	dim3	rls
 
 
 export const detailProduitFields:Fields = {
@@ -213,9 +181,12 @@ export const detailDelaiFormFields:Fields = {
 
 
 export const budgetFields:Fields = {
-    refProject:{label:"REF",column:"refProject",type:"text",required:true},
-    dateOuverture:{label:"DATE OUVERTURE",column:"dateOuverture",type:"date",required:true},
-}
+    dateOuverture:{label:"DATE CREATION",column:"dateOuverture",type:"date",required:true},
+    project:{label:"OBJET",column:"refProject",type:"text",required:true},
+    client:{label:"CLIENT",column:"client",type:"select",required:true , queryFct:getClients, queryArg:undefined, selectLabel:'nom' },
+    responsable:{label:"RESPONSABLE",column:"responsable",type:"select",required:true , queryFct:getResponsables, queryArg:undefined, selectLabel:'nom' },
+
+}   
 
 export const avenantFields:Fields = {
     titre:{label:"TITRE",column:"titre",type:"text",required:true},
@@ -313,6 +284,109 @@ export const rcfFields:Fields = {
 
 
 
+export const detailBesoinFields:Fields = {
+    qte:{label:"QUANTITE",column:"qte",type:"number",required:true},
+}
+export const detailDemandeDevisFields:Fields = {
+    qte:{label:"QUANTITE",column:"qte",type:"number",required:true},
+
+}
+
+export const detailDevisFields:Fields = {
+    qte:{label:"QUANTITE",column:"qte",type:"number",required:true},
+    prixUnitaire:{label:"PRIX UNITAIRE",column:"prixUnitaire",type:"number",required:true},
+    devis:{label:"DEVIS",column:"devis",type:"select",required:true, queryFct:getDeviss, queryArg:undefined, selectLabel:'reference'},
+    charge:{label:"CHARGE",column:"charge",type:"select",required:true, queryFct:getChargeStandards, queryArg:undefined, selectLabel:'designation'},
+
+}
+
+
+
+export const  transportFields:Fields = {
+    dateDepart:{label:"DATE DEPART",column:"dateDepart",type:"date",required:true},
+    dateArrive:{label:"DATE ARRIVE",column:"dateArrive",type:"date",required:true},
+    prisEnChargePar:{label:"PRIS EN CHARGE PAR",column:"prisEnChargePar",type:"text",required:true},
+    lienPhoto:{label:"LIEN PHOTO",column:"lienPhoto",type:"text",required:true},
+    type:{label:"TYPE",column:"type",type:"text",required:true},
+    matricule:{label:"MATRICULE",column:"matricule",type:"text",required:true},
+    chauffeur:{label:"CHAUFFEUR",column:"chauffeur",type:"text",required:true},
+    chauffeurCin:{label:"CHAUFFEUR CIN",column:"chauffeurCin",type:"text",required:true},
+    reception:{label:"RECEPTION",column:"reception",type:"select",required:true, queryFct:getReceptions, queryArg:undefined, selectLabel:'reference'},
+
+}
+
+export const detailReceptionFields:Fields = {
+    qte:{label:"QUANTITE",column:"qte",type:"number",required:true},
+    lienPhotoArticle:{label:"LIEN PHOTO ARTICLE",column:"lienPhotoArticle",type:"text",required:true},
+    reception:{label:"RECEPTION",column:"reception",type:"select",required:true, queryFct:getReceptions, queryArg:undefined, selectLabel:'reference'},
+}
+
+
+export const detailFactureFields:Fields={
+    qteAFacture:{label:"QUANTITE A FACTURE",column:"qteAFacture",type:"number",required:true},
+    qteRectifie:{label:"QUANTITE RECTIFIE",column:"qteRectifie",type:"number",required:true},
+    prixUnitaireHtRectifie:{label:"PRIX UNITAIRE HT RECTIFIE",column:"prixUnitaireHtRectifie",type:"number",required:true},
+    facture:{label:"FACTURE",column:"facture",type:"select",required:true, queryFct:getFactures, queryArg:undefined, selectLabel:'reference'},
+}
+
+
+export const remiseFields:Fields = {
+    dateRemise:{label:"DATE REMISE",column:"dateRemise",type:"date",required:true},
+    remiseEn:{label:"REMISE EN",column:"remiseEn",type:"text",required:true},
+    remiseA:{label:"REMISE A",column:"remiseA",type:"text",required:true},
+    remiseVia:{label:"REMISE VIA",column:"remiseVia",type:"text",required:true},
+    lienPhotoRemise:{label:"LIEN PHOTO REMISE",column:"lienPhotoRemise",type:"text",required:true},
+
+}
+export const compteBanquaireFields:Fields = {
+    designation:{label:"DESIGNATION",column:"designation",type:"text",required:true},
+
+}
+
+export const contratDlpFields:Fields = {
+    plafond:{label:"PLAFOND",column:"plafond",type:"number",required:true},
+    lienContrat:{label:"LIEN CONTRAT",column:"lienContrat",type:"text",required:true},
+    fournisseur:{label:"FOURNISSEUR",column:"fournisseur",type:"select",required:true, queryFct:getFournisseurs, queryArg:undefined, selectLabel:'nom'},
+}
+export const evaluationFournisseurFields:Fields ={
+    date:{label:"DATE",column:"date",type:"date",required:true},
+    evaluation:{label:"EVALUATION",column:"evaluation",type:"text",required:true},
+    fournisseur:{label:"FOURNISSEUR",column:"fournisseur",type:"select",required:true, queryFct:getFournisseurs, queryArg:undefined, selectLabel:'nom'},
+}
+
+
+
+export const contratPlafondFields:Fields = {
+    dateDebut:{label:"DATE DEBUT",column:"dateDebut",type:"date",required:true},
+    dateFin:{label:"DATE FIN",column:"dateFin",type:"date",required:true},
+    delaiReglement:{label:"DELAI REGLEMENT",column:"delaiReglement",type:"number",required:true},
+    //lienContrat:{label:"LIEN CONTRAT",column:"lienContrat",type:"text",required:true},
+    fournisseur:{label:"FOURNISSEUR",column:"fournisseur",type:"select",required:true, queryFct:getFournisseurs, queryArg:undefined, selectLabel:'nom'},
+}
+
+
+
+export const contactFounisseurFields:Fields = {
+    nomComplet:{label:"NOM COMPLET",column:"nomComplet",type:"text",required:true},
+    fonction:{label:"FONCTION",column:"fonction",type:"text",required:true},
+    email:{label:"EMAIL",column:"email",type:"text",required:true},
+    tel:{label:"TEL",column:"tel",type:"text",required:true},
+    fournisseur:{label:"FOURNISSEUR",column:"fournisseur",type:"select",required:true, queryFct:getFournisseurs, queryArg:undefined, selectLabel:'nom'},
+}
+
+
+
+export const attestationRgfFields:Fields = {
+    dateDebut:{label:"DATE DEBUT",column:"dateDebut",type:"date",required:true},
+    dateFin:{label:"DATE FIN",column:"dateFin",type:"date",required:true},
+    lienAttestation:{label:"LIEN ATTESTATION",column:"lienAttestation",type:"text",required:true},
+    fournisseur:{label:"FOURNISSEUR",column:"fournisseur",type:"select",required:true, queryFct:getFournisseurs, queryArg:undefined, selectLabel:'nom'},
+}
+
+export const produitAttentesFields:Fields = {}
+export const chargeAttentesFields:Fields = {}
+export const qualiteAttentesFields:Fields = {}
+export const delaiAttentesFields:Fields = {}
 
 export { produitFields, lotFields, tacheFields };
 

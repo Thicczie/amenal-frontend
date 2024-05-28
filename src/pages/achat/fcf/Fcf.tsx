@@ -1,31 +1,34 @@
-import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonLabel } from '@ionic/react'
-import React, { useEffect } from 'react'
-import { Route, useHistory } from 'react-router'
+import {
+  IonTabs,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonLabel,
+} from "@ionic/react";
+import React, { useEffect } from "react";
 
-import Listes from '../../Listes'
-import Ajout from '../../Ajout'
-import InstancesFcf from './InstancesFcf'
-import AjoutFct from './AjoutFct'
-import BottomTabs from '../../../components/BottomTabs'
-import { useNavigate } from 'react-router-dom'
+import Listes from "../../Listes";
+import Ajout from "../../Ajout";
+import InstancesFcf from "./InstancesFcf";
+import AjoutFct from "./AjoutFct";
+import BottomTabs from "../../../components/BottomTabs";
+import { Outlet, useNavigate } from "react-router-dom";
 
-type Props = {
- 
-}
+type Props = {};
 
-const Fcfs:React.FC<Props> =(props:Props) =>{
-
+const Fcfs: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    navigate('instances');
-  }, [navigate]);
+  // useEffect(() => {
+  //   navigate("instances");
+  // }, [navigate]);
 
-  return <>
-<BottomTabs module='fcf' />
+  return (
+    <>
+      <Outlet />
+      <BottomTabs module="fcf" />
+    </>
+  );
+};
 
- 
-</>
-}
-
-export default Fcfs
+export default Fcfs;

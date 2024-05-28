@@ -28,6 +28,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { jsPDF } from "jspdf"; //or use your library of choice here
 import autoTable, { Row } from "jspdf-autotable";
 import { mkConfig, generateCsv, download } from "export-to-csv"; //or use your library of choice here
+import { MRT_Localization_FR } from "material-react-table/locales/fr";
 
 import {
   Directory,
@@ -43,7 +44,7 @@ import { useAppContext } from "../contexts/AppContext";
 import XLSXUpload from "./xlsxUpload";
 import ReactDOM from "react-dom";
 import React from "react";
-import { useHistory } from "react-router";
+
 import { Upload } from "@mui/icons-material";
 import ModifyDialogButton from "./ModifyDialog";
 import { produitFields } from "../constants/FormFields";
@@ -233,11 +234,12 @@ const Table: React.FC<TableProps> = ({
     data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
     enableColumnResizing: true,
     enablePagination: true,
-    enableFullScreenToggle: false,
+    enableFullScreenToggle: true,
     enableStickyHeader: true,
     enableEditing: enableEditing,
     enableDensityToggle: false,
     enableRowActions: true,
+    localization: { ...MRT_Localization_FR, rowsPerPage: "" },
 
     initialState: {
       columnVisibility: {
@@ -245,6 +247,7 @@ const Table: React.FC<TableProps> = ({
         produitId: false,
         lotId: false,
         activiteId: false,
+        status: false,
         ordre: !hideColumns, // hides unwanted columns
         produit: !hideColumns,
         lot: !hideColumns,
@@ -332,26 +335,29 @@ const Table: React.FC<TableProps> = ({
                 Exporter Excel
               </MenuItem>
 
-              <MenuItem
-                onClick={() => {
-                  handleActionMenuClose();
-                  xlsxButtonRef.current?.showModal();
-                }}
-                disabled={!enableXlsxUpload}
-              >
-                <UploadIcon />
-                Importer Excel
-              </MenuItem>
+              {enableXlsxUpload && (
+                <MenuItem
+                  onClick={() => {
+                    handleActionMenuClose();
+                    xlsxButtonRef.current?.showModal();
+                  }}
+                  disabled={!enableXlsxUpload}
+                >
+                  <UploadIcon />
+                  Importer Excel
+                </MenuItem>
+              )}
 
-              <MenuItem
-                disabled={!enableSeeAll}
-                onClick={(e) => {
-                  handleVoirToutClick(e);
-                  handleActionMenuClose();
-                }}
-              >
-                Voir Tout
-              </MenuItem>
+              {enableSeeAll && (
+                <MenuItem
+                  onClick={(e) => {
+                    handleVoirToutClick(e);
+                    handleActionMenuClose();
+                  }}
+                >
+                  Voir Tout
+                </MenuItem>
+              )}
             </Menu>
 
             {enableXlsxUpload && <XLSXUpload buttonRef={xlsxButtonRef} />}
@@ -389,6 +395,7 @@ const Table: React.FC<TableProps> = ({
         sx: {
           cursor: "pointer", //you might want to change the cursor too when adding an onClick
           backgroundColor: row === selectedRow ? "rgba(0,0,0,0.1)" : undefined, // Change the background color if the row is selected
+          fontWeight: row === selectedRow ? "bold" : "normal",
           border:
             row.original?.charge && row.original?.charge === currentCharge
               ? "1px solid #3880ff"
@@ -396,12 +403,47 @@ const Table: React.FC<TableProps> = ({
         },
       };
     },
-    muiTableBodyCellProps: ({ cell }) => {
-      if (typeof cell.getValue() === "boolean") {
-        return { children: cell.getValue() ? "OUI" : "NON" };
-      } else {
-        return { children: undefined };
+
+    muiBottomToolbarProps(props) {
+      return {
+        sx: {
+          maxHeight: "50px",
+          "& .MuiTablePagination-root": {
+            maxHeight: "50px",
+          },
+        },
+      };
+    },
+    // parse bool value to text
+    muiTableBodyCellProps: ({ cell, row }) => {
+      let colorStyle;
+      switch (row.original?.status) {
+        case 0:
+          colorStyle = { sx: { color: "red" } };
+          break;
+        case 1:
+          colorStyle = { sx: { color: "green" } };
+          break;
+        default:
+          colorStyle = { sx: { color: "black" } };
       }
+
+      if (typeof cell.getValue() === "boolean") {
+        return {
+          children: cell.getValue() ? "OUI" : "NON",
+          ...colorStyle,
+        };
+      } else {
+        return { children: undefined, ...colorStyle };
+      }
+    },
+    muiTablePaperProps(props) {
+      return {
+        sx: {
+          backgroundColor: "#fff",
+          boxShadow: 0,
+        },
+      };
     },
   });
 

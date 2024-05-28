@@ -28,3 +28,8 @@ export const getLotTableByAvenantId = (id, charge) => apiClient.get("/lotTable/a
 export const getSigmaTacheTable = (id, charge) => apiClient.get("/tacheTable/project/" + id + "/charge/" + charge);
 export const getTacheTableByAvenantId = (id, charge) => apiClient.get("/tacheTable/avenant/" + id + "/charge/" + charge);
 
+
+
+
+export const getClients = () => apiClient.get("/clients");
+export const getResponsables = () => apiClient.get("/personnels");

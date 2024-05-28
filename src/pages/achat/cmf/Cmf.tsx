@@ -1,29 +1,34 @@
-import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonLabel } from '@ionic/react'
-import React, { useEffect } from 'react'
-import { Route, useHistory } from 'react-router'
+import {
+  IonTabs,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonLabel,
+} from "@ionic/react";
+import React, { useEffect } from "react";
 
-import Listes from '../../Listes'
-import Ajout from '../../Ajout'
-import InstancesCmf from './InstancesCmf'
-import AjoutCmf from './AjoutCmf'
-import BottomTabs from '../../../components/BottomTabs'
-import { useNavigate } from 'react-router-dom'
+import Listes from "../../Listes";
+import Ajout from "../../Ajout";
+import InstancesCmf from "./InstancesCmf";
+import AjoutCmf from "./AjoutCmf";
+import BottomTabs from "../../../components/BottomTabs";
+import { Outlet, useNavigate } from "react-router-dom";
 
-type Props = {
- 
-}
+type Props = {};
 
-const Cmfs:React.FC<Props> =(props:Props) =>{
+const Cmfs: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    navigate('instances');
-  }, [navigate]);
+  // useEffect(() => {
+  //   navigate("instances");
+  // }, [navigate]);
 
-  return <>
-  <BottomTabs module='cmf' />
-</>
+  return (
+    <>
+      <Outlet />
+      <BottomTabs module="cmf" />
+    </>
+  );
+};
 
-}
-
-export default Cmfs
+export default Cmfs;

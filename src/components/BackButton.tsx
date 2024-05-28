@@ -1,19 +1,18 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { IconButton } from '@mui/material';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { IconButton } from "@mui/material";
+import { ArrowBackOutlined } from "@mui/icons-material";
 
-type Props = {}
+type Props = {};
 
 const BackButton = (props: Props) => {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
-    <div className=''>
-      <IconButton onClick={() => navigate(-1)}  >
-            <ArrowBackIcon/>
-      </IconButton>
-    </div>
-  )
-}
+    <IconButton onClick={() => navigate(-1)}>
+      <ArrowBackOutlined sx={{ color: "white" }} />
+    </IconButton>
+  );
+};
 
-export default BackButton
+export default BackButton;

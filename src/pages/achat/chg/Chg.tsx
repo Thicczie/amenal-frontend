@@ -1,28 +1,34 @@
-import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonLabel } from '@ionic/react'
-import React, { useEffect } from 'react'
-import { Route, useHistory } from 'react-router'
+import {
+  IonTabs,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonLabel,
+} from "@ionic/react";
+import React, { useEffect } from "react";
 
-import Listes from '../../Listes'
-import Ajout from '../../Ajout'
-import InstancesChg from './InstancesChg'
-import AjoutChg from './AjoutChg'
-import BottomTabs from '../../../components/BottomTabs'
-import { useNavigate } from 'react-router-dom'
+import Listes from "../../Listes";
+import Ajout from "../../Ajout";
+import InstancesChg from "./InstancesChg";
+import AjoutChg from "./AjoutChg";
+import BottomTabs from "../../../components/BottomTabs";
+import { Outlet, useNavigate } from "react-router-dom";
 
-type Props = {
- 
-}
+type Props = {};
 
-const Chgs:React.FC<Props> =(props:Props) =>{
+const Chgs: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    navigate('instances');
-  }, [navigate]);
- 
-  return <>
-    <BottomTabs module='chg' />
-</>
-}
+  // useEffect(() => {
+  //   navigate("instances");
+  // }, [navigate]);
 
-export default Chgs
+  return (
+    <>
+      <Outlet />
+      <BottomTabs module="chg" />
+    </>
+  );
+};
+
+export default Chgs;

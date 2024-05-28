@@ -39,6 +39,9 @@ import SigmaCheckbox from "../../components/SigmaCheckbox";
 import { Dialog } from "@capacitor/dialog";
 import { useParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
+import PageHeader from "../../components/PageHeader";
+import { Accordion, AccordionSummary } from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
 
 const AllDetails: React.FC = () => {
   const [currentDetailTable, setCurrentDetailTable] =
@@ -181,7 +184,7 @@ const AllDetails: React.FC = () => {
   }
 
   const ValiderButton: React.FC = () => {
-    const { avenantId } = useAppContext();
+    const { avenantId } = useParams();
     const [isMutating, setIsMutating] = React.useState<boolean>(false);
 
     const mutation = useMutation({
@@ -262,7 +265,7 @@ const AllDetails: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
+      {/* <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
             <IonBackButton></IonBackButton>
@@ -273,7 +276,10 @@ const AllDetails: React.FC = () => {
             <SigmaCheckbox />
           </div>
         </IonToolbar>
-      </IonHeader>
+      </IonHeader> */}
+      <PageHeader title="All Details" enableMenuButton={false}>
+        <SigmaCheckbox />
+      </PageHeader>
       <IonContent>
         <IonSegment
           onIonChange={(e) => {
@@ -281,6 +287,7 @@ const AllDetails: React.FC = () => {
           }}
           mode="md"
           value={currentDetailTable}
+          color="primary"
         >
           <IonSegmentButton value="produits">Produits</IonSegmentButton>
           <IonSegmentButton value="charges">Charges</IonSegmentButton>
@@ -297,6 +304,7 @@ const AllDetails: React.FC = () => {
             isPending={detailsproduits.isFetching}
             hideColumns={true}
             title={detailCardTitle}
+            enableEditing
           />
         )}
         {currentDetailTable == "charges" && (
@@ -308,6 +316,7 @@ const AllDetails: React.FC = () => {
             isPending={detailscharges.isFetching}
             hideColumns={true}
             title={detailCardTitle}
+            enableEditing
           />
         )}
         {currentDetailTable == "delais" && (
@@ -318,6 +327,7 @@ const AllDetails: React.FC = () => {
             isError={detailsdelais.isError}
             isPending={detailsdelais.isFetching}
             title={detailCardTitle}
+            enableEditing
           />
         )}
         {currentDetailTable == "qualites" && (
@@ -329,57 +339,62 @@ const AllDetails: React.FC = () => {
             isPending={detailsqualites.isFetching}
             hideColumns={true}
             title={detailCardTitle}
+            enableEditing
           />
         )}
 
-        {currentDetailTable == "produits" && !currentSigma && (
-          <TableCard
-            tableName="detailProduit"
-            data={detailsproduitsAttentes?.data}
-            columns={detailProduitsAttentesColumns}
-            isError={detailsproduitsAttentes.isError}
-            isPending={detailsproduitsAttentes.isFetching}
-            hideColumns={true}
-            title={attentesCardTitle}
-            HeaderContent={<ValiderButton />}
-          />
-        )}
-        {currentDetailTable == "charges" && !currentSigma && (
-          <TableCard
-            tableName="detailCharge"
-            data={detailschargesAttentes?.data}
-            columns={detailChargesAttentesColumns}
-            isError={detailschargesAttentes.isError}
-            isPending={detailschargesAttentes.isFetching}
-            hideColumns={true}
-            title={attentesCardTitle}
-            HeaderContent={<ValiderButton />}
-          />
-        )}
-        {currentDetailTable == "delais" && !currentSigma && (
-          <TableCard
-            tableName="detailDelai"
-            data={detailsdelaisAttentes?.data}
-            columns={detailDelaisAttentesColumns}
-            isError={detailsdelaisAttentes.isError}
-            isPending={detailsdelaisAttentes.isFetching}
-            hideColumns={true}
-            title={attentesCardTitle}
-            HeaderContent={<ValiderButton />}
-          />
-        )}
-        {currentDetailTable == "qualites" && !currentSigma && (
-          <TableCard
-            tableName="detailQualite"
-            data={detailsqualitesAttentes?.data}
-            columns={detailQualitesAttentesColumns}
-            isError={detailsqualitesAttentes.isError}
-            isPending={detailsqualitesAttentes.isFetching}
-            hideColumns={true}
-            title={attentesCardTitle}
-            HeaderContent={<ValiderButton />}
-          />
-        )}
+        <div className="">
+          <Accordion sx={{ border: 0, boxShadow: 0, padding: 0, margin: 0 }}>
+            <AccordionSummary expandIcon={<ExpandMore />}>
+              <IonTitle>{attentesCardTitle}</IonTitle>
+              <ValiderButton />
+            </AccordionSummary>
+            {currentDetailTable == "produits" && !currentSigma && (
+              <TableCard
+                tableName="detailProduit"
+                data={detailsproduitsAttentes?.data}
+                columns={detailProduitsAttentesColumns}
+                isError={detailsproduitsAttentes.isError}
+                isPending={detailsproduitsAttentes.isFetching}
+                hideColumns={true}
+                enableEditing
+              />
+            )}
+            {currentDetailTable == "charges" && !currentSigma && (
+              <TableCard
+                tableName="detailCharge"
+                data={detailschargesAttentes?.data}
+                columns={detailChargesAttentesColumns}
+                isError={detailschargesAttentes.isError}
+                isPending={detailschargesAttentes.isFetching}
+                hideColumns={true}
+                enableEditing
+              />
+            )}
+            {currentDetailTable == "delais" && !currentSigma && (
+              <TableCard
+                tableName="detailDelai"
+                data={detailsdelaisAttentes?.data}
+                columns={detailDelaisAttentesColumns}
+                isError={detailsdelaisAttentes.isError}
+                isPending={detailsdelaisAttentes.isFetching}
+                hideColumns={true}
+                enableEditing
+              />
+            )}
+            {currentDetailTable == "qualites" && !currentSigma && (
+              <TableCard
+                tableName="detailQualite"
+                data={detailsqualitesAttentes?.data}
+                columns={detailQualitesAttentesColumns}
+                isError={detailsqualitesAttentes.isError}
+                isPending={detailsqualitesAttentes.isFetching}
+                hideColumns={true}
+                enableEditing
+              />
+            )}
+          </Accordion>
+        </div>
       </IonContent>
     </IonPage>
   );

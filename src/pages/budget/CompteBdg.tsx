@@ -1,4 +1,3 @@
-
 import React, { ReactNode, useEffect } from "react";
 
 import {
@@ -15,20 +14,25 @@ import {
   IonToolbar,
   IonMenuButton,
 } from "@ionic/react";
-import ListIcon from '@mui/icons-material/List';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import ListIcon from "@mui/icons-material/List";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import Ajout from "../Ajout";
 import Listes from "../Listes";
 import Instances from "./Instances";
 import AjoutBdg from "./AjoutBdg";
-import { NavLinkProps, Outlet, useNavigate } from "react-router-dom";
+import {
+  NavLinkProps,
+  Outlet,
+  useLocation,
+  useMatch,
+  useNavigate,
+} from "react-router-dom";
 import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import BottomTabs from "../../components/BottomTabs";
-const CompteBdg :React.FC = () => {
-
-
+import { Box } from "@mui/material";
+const CompteBdg: React.FC = () => {
   //onst history = useHistory();
 
   // useEffect(() => {
@@ -36,17 +40,23 @@ const CompteBdg :React.FC = () => {
   // }, []);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    navigate('instances');
-  }, [navigate]);
+  // useEffect(() => {
+  //   navigate("instances");
+  // }, []);
 
-  return <>
+  return (
+    // <>
+    //   <Outlet />
+    //   <BottomTabs module="budget" />
+    // </>
 
-  <BottomTabs module="budget" />
-  
-  </>
-  
+    <>
+      {" "}
+      {/* Adjust the value as needed */}
+      <Outlet />
+      <BottomTabs module="budget" />
+    </>
+  );
 };
 
 export default CompteBdg;
-

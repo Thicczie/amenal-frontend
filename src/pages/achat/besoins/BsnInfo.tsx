@@ -1,19 +1,27 @@
-import { IonPage, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonBackButton } from '@ionic/react'
-import React from 'react'
-import { useHistory } from 'react-router'
-import InfoCard from '../../../components/InfoCard'
-import TableCard from '../../../components/TableCard'
-import { BsnLayout, BsnTitleLayout } from '../../../constants/infoLayout'
-import useColumns from '../../../hooks/useColumns'
-import { fabClasses } from '@mui/material'
-import AchatElemInfo from '../AchatElemInfo'
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonMenuButton,
+  IonTitle,
+  IonContent,
+  IonBackButton,
+} from "@ionic/react";
+import React from "react";
 
-type Props = {}
+import InfoCard from "../../../components/InfoCard";
+import TableCard from "../../../components/TableCard";
+import { BsnLayout, BsnTitleLayout } from "../../../constants/infoLayout";
+import useColumns from "../../../hooks/useColumns";
+import { fabClasses } from "@mui/material";
+import AchatElemInfo from "../AchatElemInfo";
 
-const BsnInfo:React.FC = (props: Props) => {
+type Props = {};
+
+const BsnInfo: React.FC = (props: Props) => {
   //   const {id , details}:any=useHistory().location.state ?? {};
   //   const detailsBesoinsColumns=useColumns(details)
-
 
   // return (
   //   <IonPage>
@@ -23,7 +31,7 @@ const BsnInfo:React.FC = (props: Props) => {
   //           <IonBackButton></IonBackButton>
   //       </IonButtons>
   //   <IonTitle >Infos</IonTitle>
-  
+
   //         </IonToolbar>
   //       </IonHeader>
   //   <IonContent >
@@ -31,10 +39,15 @@ const BsnInfo:React.FC = (props: Props) => {
   //   <InfoCard currentInfo='BSN' TitleLayout={BsnTitleLayout} Layout={BsnLayout} />
   //   <TableCard title='details'  columns={detailsBesoinsColumns} data={details} isPending={false} isError={false}  />
 
-    
   //   </IonContent>
   //   </IonPage>  )
-  return <AchatElemInfo Title='BSN' InfoLayout={BsnLayout} TitleLayout={BsnTitleLayout} />
-}
+  return (
+    <AchatElemInfo
+      Title="BSN"
+      InfoLayout={BsnLayout}
+      TitleLayout={BsnTitleLayout}
+    />
+  );
+};
 
-export default BsnInfo
+export default BsnInfo;

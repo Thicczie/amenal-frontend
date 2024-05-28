@@ -1,29 +1,34 @@
-import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonLabel } from '@ionic/react'
-import React, { useEffect } from 'react'
-import { Route, useHistory } from 'react-router'
+import {
+  IonTabs,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonLabel,
+} from "@ionic/react";
+import React, { useEffect } from "react";
 
-import Listes from '../../Listes'
-import Ajout from '../../Ajout'
-import InstancesDvf from './InstancesDvf'
-import AjoutDvf from './AjoutDvf'
-import BottomTabs from '../../../components/BottomTabs'
-import { useNavigate } from 'react-router-dom'
+import Listes from "../../Listes";
+import Ajout from "../../Ajout";
+import InstancesDvf from "./InstancesDvf";
+import AjoutDvf from "./AjoutDvf";
+import BottomTabs from "../../../components/BottomTabs";
+import { Outlet, useNavigate } from "react-router-dom";
 
-type Props = {
- 
-}
+type Props = {};
 
-const Dvfs:React.FC<Props> =(props:Props) =>{
+const Dvfs: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    navigate('instances');
-  }, [navigate]);
+  // useEffect(() => {
+  //   navigate("instances");
+  // }, [navigate]);
 
+  return (
+    <>
+      <Outlet />
+      <BottomTabs module="dvf" />
+    </>
+  );
+};
 
-  return <>
-  <BottomTabs module='dvf' />
-</>
-}
-
-export default Dvfs
+export default Dvfs;
