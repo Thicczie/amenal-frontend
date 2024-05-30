@@ -4,6 +4,11 @@ const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
   appName: 'amenal',
   webDir: 'dist',
+  plugins: {
+    CapacitorCookies: {
+      enabled: true,
+    },
+  },
 
   
 };

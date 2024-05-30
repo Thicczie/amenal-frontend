@@ -46,6 +46,7 @@ import {
 } from "@mui/icons-material";
 import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import { Link } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 const needIcon = (): React.ReactNode => {
   const theme = useTheme();
@@ -154,6 +155,10 @@ const SideMenuButton: React.FC = () => {
       ],
     },
   ];
+  const { logout, userCredentials } = useAuth();
+  const userLogOut = () => {
+    logout();
+  };
 
   // const closeMenu = () => {
   //   (document.getElementById('menu') as HTMLIonMenuElement)?.close();
@@ -206,7 +211,12 @@ const SideMenuButton: React.FC = () => {
 
                   {content.label}
                 </AccordionSummary> */}
-                <Collapse in={expanded[index]} timeout="auto" unmountOnExit>
+                <Collapse
+                  key={contentIndex}
+                  in={expanded[index]}
+                  timeout="auto"
+                  unmountOnExit
+                >
                   <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 4 }}>
                       <ListItemIcon>{content?.icon}</ListItemIcon>
@@ -275,9 +285,9 @@ const SideMenuButton: React.FC = () => {
             onClose={() => setShowDropDown(false)}
           >
             <MenuItem>Profile</MenuItem>
-            <MenuItem>Log Out</MenuItem>
+            <MenuItem onClick={() => userLogOut()}>Log Out</MenuItem>
           </Menu>
-          John Doe
+          {userCredentials?.email}
           <IconButton
             className="bg-white"
             id="account-more-button"

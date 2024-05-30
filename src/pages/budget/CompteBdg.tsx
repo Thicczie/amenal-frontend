@@ -40,9 +40,11 @@ const CompteBdg: React.FC = () => {
   // }, []);
   const navigate = useNavigate();
 
+  const from = useLocation().state?.from?.pathname || "/";
+
   // useEffect(() => {
-  //   navigate("instances");
-  // }, []);
+  //   if (from === "/budget") navigate("instances");
+  // }, [from]);
 
   return (
     // <>

@@ -78,6 +78,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import toast, { ToastBar, Toaster } from "react-hot-toast";
 import { CloseOutlined } from "@mui/icons-material";
 import React from "react";
+import { AuthProvider } from "./contexts/AuthContextProvider";
+import { CookiesProvider } from "react-cookie";
 
 setupIonicReact({
   mode: "md",
@@ -111,6 +113,28 @@ const App: React.FC = () => {
         </ThemeProvider>
       </QueryClientProvider>
     </IonApp>
+  );
+};
+
+const ToastContainer = () => {
+  return (
+    <Toaster position="top-right">
+      {(t) => (
+        <ToastBar position="top-right" toast={t}>
+          {({ icon, message }) => (
+            <>
+              {icon}
+              {message}
+              {t.type !== "loading" && (
+                <button onClick={() => toast.dismiss(t.id)}>
+                  <CloseOutlined />
+                </button>
+              )}
+            </>
+          )}
+        </ToastBar>
+      )}
+    </Toaster>
   );
 };
 
@@ -171,27 +195,15 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      <AppProvider>
-        {/* <RouterProvider router={router}></RouterProvider> */}
-        <Toaster position="top-right">
-          {(t) => (
-            <ToastBar position="top-right" toast={t}>
-              {({ icon, message }) => (
-                <>
-                  {icon}
-                  {message}
-                  {t.type !== "loading" && (
-                    <button onClick={() => toast.dismiss(t.id)}>
-                      <CloseOutlined />
-                    </button>
-                  )}
-                </>
-              )}
-            </ToastBar>
-          )}
-        </Toaster>
-        <Router></Router>
-      </AppProvider>
+      <AuthProvider>
+        <CookiesProvider>
+          <AppProvider>
+            {/* <RouterProvider router={router}></RouterProvider> */}
+            <ToastContainer />
+            <Router></Router>
+          </AppProvider>
+        </CookiesProvider>
+      </AuthProvider>
     </>
   );
 };

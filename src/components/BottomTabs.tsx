@@ -117,28 +117,6 @@ const BottomTabs: React.FC<Props> = (props: Props) => {
 
 export default BottomTabs;
 
-type TabProps = {
-  label: string;
-  icon?: React.ReactNode;
-  to: string;
-};
-const TabButton: React.FC<TabProps> = (props: TabProps) => {
-  return (
-    <NavLink
-      to={props.to}
-      type="button"
-      className={
-        "inline-flex w-full flex-col items-center justify-center px-5 hover:bg-ion-dark-shade bg-ion dark:1f1f1f dark:hover:bg-ion-dark-shade"
-      }
-    >
-      {props.icon}
-      <IonLabel className="text-sm text-ion-light-shade ">
-        {props.label}
-      </IonLabel>
-    </NavLink>
-  );
-};
-
 import { styled } from "@mui/material/styles";
 import Tabs from "@mui/material/Tabs";
 import { alignProperty } from "@mui/material/styles/cssUtils";

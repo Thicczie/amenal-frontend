@@ -5,7 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -14,6 +14,9 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Form, Formik, useField, useFormik } from "formik";
 import * as yup from "yup";
+import { login } from "../api/auth/auth_api";
+import useAuth from "../hooks/useAuth";
+import apiClient from "../api/apiClient";
 
 function Copyright(props: any) {
   return (
@@ -37,6 +40,9 @@ function Copyright(props: any) {
 
 export default function SignIn() {
   const [rememberMe, setRememberMe] = React.useState(false);
+  const [signinError, setSigninError] = React.useState(false);
+  const { authTokens, Login } = useAuth();
+  const navigate = useNavigate();
 
   const validationSchema = yup.object({
     email: yup
@@ -54,8 +60,40 @@ export default function SignIn() {
       password: "",
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       console.log(values);
+      // login(values).then((res): any => {
+      //   if (!res.ok) {
+      //     setSigninError(true);
+      //     formik.resetForm();
+      //   } else {
+      //     setSigninError(false);
+      //     console.log("res", res);
+
+      //     const data: any = res?.data;
+      //     setAuth((prevAuth: any) => ({
+      //       ...prevAuth,
+      //       token: data?.access_token ?? null,
+      //     }));
+      //     apiClient.setHeaders({
+      //       Authorization: `Bearer ${data?.access_token}`,
+      //     });
+      //     navigate("/");
+      //   }
+      // });
+
+      const res = await Login(values.email, values.password);
+      console.log("res", res);
+
+      if (res) {
+        console.log("navigating");
+        console.log("authTokenssss login", authTokens);
+
+        navigate("/");
+      } else {
+        setSigninError(true);
+        formik.resetForm();
+      }
     },
   });
 
@@ -71,11 +109,14 @@ export default function SignIn() {
         }}
       >
         <Box sx={{ m: 1 }}>
-          <img src="/public/Logo.png" alt="logo" width={50} />
+          <img src="/Logo.png" alt="logo" width={50} />
         </Box>
         <Typography component="h1" variant="h5">
           Connectez-Vous
         </Typography>
+        <span style={{ color: "red" }}>
+          {signinError ? "Email ou mot de passe incorrect!" : ""}
+        </span>
         <form onSubmit={formik.handleSubmit}>
           <TextField
             margin="normal"
@@ -102,10 +143,21 @@ export default function SignIn() {
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
           />
-          <Button color="primary" variant="contained" fullWidth type="submit">
+          <Button
+            sx={{ mt: 2 }}
+            color="primary"
+            variant="contained"
+            fullWidth
+            type="submit"
+          >
             Se Connecter
           </Button>
         </form>
+        <Grid container justifyContent="flex-end">
+          <Grid item>
+            <Link to="/signup">Don't have an account? Sign up</Link>
+          </Grid>
+        </Grid>
       </Box>
       <Copyright sx={{ mt: 8, mb: 4 }} />
     </Container>

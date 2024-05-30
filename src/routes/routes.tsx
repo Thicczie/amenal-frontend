@@ -55,6 +55,7 @@ import InstancesFrs from "../pages/achat/frs/InstancesFrs";
 import AllDetails from "../pages/budget/AllDetails";
 import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
+import RequireAuth from "../components/auth/RequireAuth";
 
 //TODO : non linear routing
 
@@ -328,11 +329,26 @@ export const Router: React.FC<Props> = ({ children }) => {
       <BrowserRouter>
         {children}
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/budget" element={<CompteBdg />}>
-            <Route path="instances" element={<Instances />} />
-            <Route path="iteminfo/:projectId" element={<ItemInfo />}>
-              <Route path="iteminfodetail/:avenantId" element={<ItemDetails />}>
+          <Route element={<RequireAuth />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/budget" element={<CompteBdg />}>
+              <Route index path="instances" element={<Instances />} />
+              <Route path="iteminfo/:projectId" element={<ItemInfo />}>
+                <Route
+                  path="iteminfodetail/:avenantId"
+                  element={<ItemDetails />}
+                >
+                  <Route
+                    path="details/:currentTable/:tableName"
+                    element={<Details />}
+                  />
+                  <Route
+                    path="details2/:currentTable/:tableName"
+                    element={<Details2 />}
+                  />
+                  <Route path="graph" element={<Graph />} />
+                  <Route path="allDetails" element={<AllDetails />} />
+                </Route>
                 <Route
                   path="details/:currentTable/:tableName"
                   element={<Details />}
@@ -344,73 +360,63 @@ export const Router: React.FC<Props> = ({ children }) => {
                 <Route path="graph" element={<Graph />} />
                 <Route path="allDetails" element={<AllDetails />} />
               </Route>
-              <Route
-                path="details/:currentTable/:tableName"
-                element={<Details />}
-              />
-              <Route
-                path="details2/:currentTable/:tableName"
-                element={<Details2 />}
-              />
-              <Route path="graph" element={<Graph />} />
-              <Route path="allDetails" element={<AllDetails />} />
+              <Route path="ajout" element={<AjoutBdg />} />
+              <Route path="listes" element={<Listes />} />
             </Route>
-            <Route path="ajout" element={<AjoutBdg />} />
-            <Route path="listes" element={<Listes />} />
-          </Route>
-          <Route path="/bsn" element={<Besoins />}>
-            <Route path="instances" element={<InstancesBsn />} />
-            <Route path="ajout" element={<AjoutBsn />} />
-            <Route path="info/:id" element={<BsnInfo />} />
-            <Route path="listes" element={<Listes />} />
-          </Route>
-          <Route path="/ddf" element={<Ddfs />}>
-            <Route path="info/:id" element={<DdfInfo />} />
-            <Route path="ajout" element={<AjoutDdf />} />
-            <Route path="instances" element={<InstancesDdf />} />
-            <Route path="listes" element={<Listes />} />
-          </Route>
-          <Route path="/dvf" element={<Dvfs />}>
-            <Route path="info/:id" element={<DvfInfo />} />
-            <Route path="ajout" element={<AjoutDvf />} />
-            <Route path="instances" element={<InstancesDvf />} />
-            <Route path="listes" element={<Listes />} />
-          </Route>
-          <Route path="/cmf" element={<Cmfs />}>
-            <Route path="info/:id" element={<CmfInfo />} />
-            <Route path="ajout" element={<AjoutCmf />} />
-            <Route path="instances" element={<InstancesCmf />} />
-            <Route path="listes" element={<Listes />} />
-          </Route>
-          <Route path="/rcf" element={<Rcfs />}>
-            <Route path="info/:id" element={<RcfInfo />} />
-            <Route path="ajout" element={<AjoutRcf />} />
-            <Route path="instances" element={<InstancesRcf />} />
-            <Route path="listes" element={<Listes />} />
-          </Route>
-          <Route path="/fcf" element={<Fcfs />}>
-            <Route path="info/:id" element={<FcfInfo />} />
-            <Route path="ajout" element={<AjoutFct />} />
-            <Route path="instances" element={<InstancesFcf />} />
-            <Route path="listes" element={<Listes />} />
-          </Route>
-          <Route path="/pmf" element={<Pmfs />}>
-            <Route path="info/:id" element={<PmfInfo />} />
-            <Route path="ajout" element={<AjoutPmf />} />
-            <Route path="instances" element={<InstancesPmf />} />
-            <Route path="listes" element={<Listes />} />
-          </Route>
-          <Route path="/frs" element={<Frss />}>
-            <Route path="info/:id" element={<FrsInfo />} />
-            <Route path="ajout" element={<AjoutFrs />} />
-            <Route path="instances" element={<InstancesFrs />} />
-            <Route path="listes" element={<Listes />} />
-          </Route>
-          <Route path="/chg" element={<Chgs />}>
-            <Route path="info/:id" element={<ChgInfo />} />
-            <Route path="ajout" element={<AjoutChg />} />
-            <Route path="instances" element={<InstancesChg />} />
-            <Route path="listes" element={<Listes />} />
+            <Route path="/bsn" element={<Besoins />}>
+              <Route path="instances" element={<InstancesBsn />} />
+              <Route path="ajout" element={<AjoutBsn />} />
+              <Route path="info/:id" element={<BsnInfo />} />
+              <Route path="listes" element={<Listes />} />
+            </Route>
+            <Route path="/ddf" element={<Ddfs />}>
+              <Route path="info/:id" element={<DdfInfo />} />
+              <Route path="ajout" element={<AjoutDdf />} />
+              <Route path="instances" element={<InstancesDdf />} />
+              <Route path="listes" element={<Listes />} />
+            </Route>
+            <Route path="/dvf" element={<Dvfs />}>
+              <Route path="info/:id" element={<DvfInfo />} />
+              <Route path="ajout" element={<AjoutDvf />} />
+              <Route path="instances" element={<InstancesDvf />} />
+              <Route path="listes" element={<Listes />} />
+            </Route>
+            <Route path="/cmf" element={<Cmfs />}>
+              <Route path="info/:id" element={<CmfInfo />} />
+              <Route path="ajout" element={<AjoutCmf />} />
+              <Route path="instances" element={<InstancesCmf />} />
+              <Route path="listes" element={<Listes />} />
+            </Route>
+            <Route path="/rcf" element={<Rcfs />}>
+              <Route path="info/:id" element={<RcfInfo />} />
+              <Route path="ajout" element={<AjoutRcf />} />
+              <Route path="instances" element={<InstancesRcf />} />
+              <Route path="listes" element={<Listes />} />
+            </Route>
+            <Route path="/fcf" element={<Fcfs />}>
+              <Route path="info/:id" element={<FcfInfo />} />
+              <Route path="ajout" element={<AjoutFct />} />
+              <Route path="instances" element={<InstancesFcf />} />
+              <Route path="listes" element={<Listes />} />
+            </Route>
+            <Route path="/pmf" element={<Pmfs />}>
+              <Route path="info/:id" element={<PmfInfo />} />
+              <Route path="ajout" element={<AjoutPmf />} />
+              <Route path="instances" element={<InstancesPmf />} />
+              <Route path="listes" element={<Listes />} />
+            </Route>
+            <Route path="/frs" element={<Frss />}>
+              <Route path="info/:id" element={<FrsInfo />} />
+              <Route path="ajout" element={<AjoutFrs />} />
+              <Route path="instances" element={<InstancesFrs />} />
+              <Route path="listes" element={<Listes />} />
+            </Route>
+            <Route path="/chg" element={<Chgs />}>
+              <Route path="info/:id" element={<ChgInfo />} />
+              <Route path="ajout" element={<AjoutChg />} />
+              <Route path="instances" element={<InstancesChg />} />
+              <Route path="listes" element={<Listes />} />
+            </Route>
           </Route>
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />

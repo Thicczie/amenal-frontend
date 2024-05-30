@@ -19,10 +19,12 @@ import { useAppContext } from "../../contexts/AppContext";
 import { BdgLayout, BdgTitleLayout } from "../../constants/infoLayout";
 import ButtonList from "../../components/buttonList";
 import {
+  Box,
   Dialog,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Fab,
 } from "@mui/material";
 import AddForm from "../AddForm";
 import {
@@ -38,6 +40,9 @@ import ItemDetails from "./ItemDetails";
 import BackButton from "../../components/BackButton";
 import { Outlet, useMatch, useNavigate, useParams } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
+import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
+import { DoneAllOutlined } from "@mui/icons-material";
+import FabDialog from "../../components/fabDialog";
 
 //this is the BDG screen
 
@@ -99,6 +104,17 @@ const ItemInfo: React.FC = () => {
             tableName="avenant"
           />
         )}
+        {/* <Box sx={{ position: "fixed", bottom: 16, right: 16 }}>
+          <div className="flex gap-2 flex-col">
+            <Fab color="primary">
+              <LockOpenOutlinedIcon />
+            </Fab>
+            <Fab color="primary">
+              <DoneAllOutlined />
+            </Fab>
+          </div>
+        </Box> */}
+        <FabDialog />
       </IonContent>
     </IonPage>
   );
