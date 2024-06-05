@@ -195,15 +195,15 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      <AuthProvider>
-        <CookiesProvider>
+      <CookiesProvider>
+        <AuthProvider>
           <AppProvider>
             {/* <RouterProvider router={router}></RouterProvider> */}
             <ToastContainer />
             <Router></Router>
           </AppProvider>
-        </CookiesProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </CookiesProvider>
     </>
   );
 };

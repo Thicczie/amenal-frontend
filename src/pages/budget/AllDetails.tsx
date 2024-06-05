@@ -17,33 +17,34 @@ import TableCard from "../../components/TableCard";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import useColumns from "../../hooks/useColumns";
 import { useAppContext } from "../../contexts/AppContext";
-import {
-  getDetailChargeAttentesByAvenantId,
-  getDetailChargeTable,
-  getDetailChargeTableByAvenantId,
-  getDetailDelaiAttentesByAvenantId,
-  getDetailDelaiTable,
-  getDetailDelaiTableByAvenantId,
-  getDetailProduitAttentesByAvenantId,
-  getDetailProduitTable,
-  getDetailProduitTableByAvenantId,
-  getDetailQualiteAttentesByAvenantId,
-  getDetailQualiteTable,
-  getDetailQualiteTableByAvenantId,
-  validerDetailChargeAttentesByAvenantId,
-  validerDetailDelaiAttentesByAvenantId,
-  validerDetailProduitAttentesByAvenantId,
-  validerDetailQualiteAttentesByAvenantId,
-} from "../../api/detail_api";
+import useDetailApi from "../../api/detail_api";
 import SigmaCheckbox from "../../components/SigmaCheckbox";
 import { Dialog } from "@capacitor/dialog";
 import { useParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import PageHeader from "../../components/PageHeader";
-import { Accordion, AccordionSummary } from "@mui/material";
+import { Accordion, AccordionSummary, Button } from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 
 const AllDetails: React.FC = () => {
+  const {
+    getDetailChargeAttentesByAvenantId,
+    getDetailChargeTable,
+    getDetailChargeTableByAvenantId,
+    getDetailDelaiAttentesByAvenantId,
+    getDetailDelaiTable,
+    getDetailDelaiTableByAvenantId,
+    getDetailProduitAttentesByAvenantId,
+    getDetailProduitTable,
+    getDetailProduitTableByAvenantId,
+    getDetailQualiteAttentesByAvenantId,
+    getDetailQualiteTable,
+    getDetailQualiteTableByAvenantId,
+    validerDetailChargeAttentesByAvenantId,
+    validerDetailDelaiAttentesByAvenantId,
+    validerDetailProduitAttentesByAvenantId,
+    validerDetailQualiteAttentesByAvenantId,
+  } = useDetailApi();
   const [currentDetailTable, setCurrentDetailTable] =
     React.useState<string>("produits");
   const { currentSigma } = useAppContext();
@@ -252,14 +253,15 @@ const AllDetails: React.FC = () => {
 
     if (isDataEmpty()) return null;
     return (
-      <IonButton
+      <Button
+        variant="contained"
         disabled={isMutating}
         onClick={() => {
           HandleValiderClick();
         }}
       >
         {isMutating ? <IonSpinner name="crescent" /> : "Valider"}
-      </IonButton>
+      </Button>
     );
   };
 
@@ -351,7 +353,7 @@ const AllDetails: React.FC = () => {
             </AccordionSummary>
             {currentDetailTable == "produits" && !currentSigma && (
               <TableCard
-                tableName="detailProduit"
+                tableName="detailProduitAttentes"
                 data={detailsproduitsAttentes?.data}
                 columns={detailProduitsAttentesColumns}
                 isError={detailsproduitsAttentes.isError}
@@ -362,7 +364,7 @@ const AllDetails: React.FC = () => {
             )}
             {currentDetailTable == "charges" && !currentSigma && (
               <TableCard
-                tableName="detailCharge"
+                tableName="detailChargeAttentes"
                 data={detailschargesAttentes?.data}
                 columns={detailChargesAttentesColumns}
                 isError={detailschargesAttentes.isError}
@@ -373,7 +375,7 @@ const AllDetails: React.FC = () => {
             )}
             {currentDetailTable == "delais" && !currentSigma && (
               <TableCard
-                tableName="detailDelai"
+                tableName="detailDelaiAttentes"
                 data={detailsdelaisAttentes?.data}
                 columns={detailDelaisAttentesColumns}
                 isError={detailsdelaisAttentes.isError}
@@ -384,7 +386,7 @@ const AllDetails: React.FC = () => {
             )}
             {currentDetailTable == "qualites" && !currentSigma && (
               <TableCard
-                tableName="detailQualite"
+                tableName="detailQualiteAttentes"
                 data={detailsqualitesAttentes?.data}
                 columns={detailQualitesAttentesColumns}
                 isError={detailsqualitesAttentes.isError}

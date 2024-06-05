@@ -1,14 +1,13 @@
-import React from 'react';
-import Ajout from '../../Ajout';
-import { ddfFields } from '../../../constants/FormFields';
+import React from "react";
+import Ajout from "../../Ajout";
+import useFormFields from "../../../constants/FormFields";
 
-type Props = {}
+type Props = {};
 
-const AjoutDdf:React.FC = (props: Props) => {
-  return (
-    <Ajout FormName="demandeDevis" formFields={ddfFields} />
-  
-  )
-}
+const AjoutDdf: React.FC = (props: Props) => {
+  const { ddfFields } = useFormFields();
 
-export default AjoutDdf
+  return <Ajout FormName="demandeDevis" formFields={ddfFields} />;
+};
+
+export default AjoutDdf;

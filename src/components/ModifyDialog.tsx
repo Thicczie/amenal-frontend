@@ -1,38 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  Fields,
-  attestationRgfFields,
-  avenantFields,
-  bsnFields,
-  budgetFields,
-  chgFields,
-  cmfFields,
-  compteBanquaireFields,
-  contactFounisseurFields,
-  contratDlpFields,
-  contratPlafondFields,
-  ddfFields,
-  detailBesoinFields,
-  detailChargeFormFields,
-  detailDelaiFormFields,
-  detailDemandeDevisFields,
-  detailDevisFields,
-  detailFactureFields,
-  detailProduitFormFields,
-  detailQualiteFormFields,
-  detailReceptionFields,
-  dvfFields,
-  evaluationFournisseurFields,
-  fcfFields,
-  frsFields,
-  lotFields,
-  pmfFields,
-  produitFields,
-  rcfFields,
-  remiseFields,
-  tacheFields,
-  transportFields,
-} from "../constants/FormFields";
+import useFormFields, { Fields } from "../constants/FormFields";
 import {
   Dialog,
   DialogTitle,
@@ -56,9 +23,7 @@ type Props = {
 
 const ModifyDialogButton: React.FC<Props> = (props: Props) => {
   const [open, setOpen] = React.useState(false);
-  console.log("row", props.row.original, "table");
   const currentFormField = getFormFields(props.currentForm);
-  console.log("currentFormField", props.currentForm);
 
   return (
     <>
@@ -77,6 +42,43 @@ const ModifyDialogButton: React.FC<Props> = (props: Props) => {
 
 export default ModifyDialogButton;
 export function getFormFields(currentForm: string): any {
+  const {
+    attestationRgfFields,
+    avenantFields,
+    bsnFields,
+    budgetFields,
+    chgFields,
+    cmfFields,
+    compteBanquaireFields,
+    contactFounisseurFields,
+    contratDlpFields,
+    contratPlafondFields,
+    ddfFields,
+    detailBesoinFields,
+    detailChargeFormFields,
+    detailDelaiFormFields,
+    detailDemandeDevisFields,
+    detailDevisFields,
+    detailFactureFields,
+    detailProduitFormFields,
+    detailQualiteFormFields,
+    detailReceptionFields,
+    dvfFields,
+    evaluationFournisseurFields,
+    fcfFields,
+    frsFields,
+    lotFields,
+    pmfFields,
+    produitFields,
+    rcfFields,
+    remiseFields,
+    tacheFields,
+    transportFields,
+    produitAttentesFields,
+    chargeAttentesFields,
+    delaiAttentesFields,
+    qualiteAttentesFields,
+  } = useFormFields();
   switch (currentForm) {
     case "lot":
       return lotFields;
@@ -98,6 +100,15 @@ export function getFormFields(currentForm: string): any {
 
     case "detailQualite":
       return detailQualiteFormFields;
+    case "detailQualiteAttentes":
+      return qualiteAttentesFields;
+
+    case "detailChargeAttentes":
+      return chargeAttentesFields;
+    case "detailDelaiAttentes":
+      return delaiAttentesFields;
+    case "detailProduitAttentes":
+      return produitAttentesFields;
 
     case "avenant":
       return avenantFields;

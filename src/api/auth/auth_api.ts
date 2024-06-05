@@ -1,5 +1,6 @@
 
-import apiClient from "../apiClient";
+import { ApisauceInstance } from "apisauce";
+import useApiClient from "../apiClient";
 
 type login={
 
@@ -12,21 +13,39 @@ type register={
     
         email:string,
         password:string,
-        firstName:string,
-        lastName:string
+        firstname:string,
+        lastname:string
     
 }
 
 
-export const login = (data:login) => apiClient.post("/auth/authenticate", data , {
-    headers: {
-        Authorization:null,
-    }});
-export const register = (data:register) => apiClient.post("/auth/register", data , {
-    headers: {
-        Authorization:null,
-    }});
-export const refreshToken = (refreshToken:string) => apiClient.post("/auth/refresh-token", {
-    headers: {
-        Authorization:`Bearer ${refreshToken}`,
-    }});
+import React from 'react'
+
+
+
+const useAuthApi = (apiClient:ApisauceInstance) => {
+
+
+     const login = (data:login) => apiClient.post("/auth/authenticate", data , {
+        headers: {
+            Authorization:null,
+        }});
+     const register = (data:register) => apiClient.post("/auth/register", data , {
+        headers: {
+            Authorization:null,
+        }});
+    const refreshToken = () => apiClient.post("/auth/refresh-token", {
+        headers: {
+            //Authorization:`Bearer ${refreshToken}`,
+        }});
+
+        return {
+            login,
+            register,
+            refreshToken
+        }
+
+}
+
+export default useAuthApi;
+

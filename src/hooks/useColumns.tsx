@@ -2,14 +2,17 @@ import { IonNav } from "@ionic/react";
 import { MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 
-import { lotFields } from "../constants/FormFields";
-
 // This hook is used to generate the columns for the MaterialReactTable component
 const useColumns = (data: any) => {
   return useMemo(() => {
     const Data: any = data?.data ? data?.data : data;
 
-    if (!Data || Data.length === 0) {
+    if (
+      !Data ||
+      Data.length === 0 ||
+      typeof Data === "undefined" ||
+      Data === null
+    ) {
       return []; // Return empty array if data is undefined, null, or empty
     }
 

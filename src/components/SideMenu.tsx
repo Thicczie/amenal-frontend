@@ -11,7 +11,7 @@ import {
   IonAccordion,
   IonAccordionGroup,
 } from "@ionic/react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Accordion,
   AccordionDetails,
@@ -47,6 +47,7 @@ import {
 import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import useAuthMethods from "../hooks/useAuthMethods";
 
 const needIcon = (): React.ReactNode => {
   const theme = useTheme();
@@ -71,6 +72,7 @@ const SideMenuButton: React.FC = () => {
     setShowDropDown(!showDropdown);
   };
   const location = useLocation();
+  const navigate = useNavigate();
 
   interface AppPage {
     title: string;
@@ -155,7 +157,8 @@ const SideMenuButton: React.FC = () => {
       ],
     },
   ];
-  const { logout, userCredentials } = useAuth();
+  const { userCredentials } = useAuth();
+  const { logout } = useAuthMethods();
   const userLogOut = () => {
     logout();
   };
@@ -284,10 +287,14 @@ const SideMenuButton: React.FC = () => {
             anchorEl={document.getElementById("account-more-button")}
             onClose={() => setShowDropDown(false)}
           >
-            <MenuItem>Profile</MenuItem>
+            {/* <MenuItem>Profile</MenuItem> */}
+            <MenuItem onClick={() => navigate("/users")}>
+              Gestion des comptes
+            </MenuItem>
+
             <MenuItem onClick={() => userLogOut()}>Log Out</MenuItem>
           </Menu>
-          {userCredentials?.email}
+          {userCredentials?.firstname + " " + userCredentials?.lastname}
           <IconButton
             className="bg-white"
             id="account-more-button"

@@ -46,6 +46,9 @@ const CompteBdg: React.FC = () => {
   //   if (from === "/budget") navigate("instances");
   // }, [from]);
 
+  useEffect(() => {
+    navigate("instances");
+  }, []);
   return (
     // <>
     //   <Outlet />

@@ -20,12 +20,7 @@ import {
 } from "formik";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import {
-  Fields,
-  lotFields,
-  produitFields,
-  tacheFields,
-} from "../constants/FormFields";
+import { Fields } from "../constants/FormFields";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
 import AddForm from "./AddForm";

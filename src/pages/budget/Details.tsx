@@ -13,30 +13,13 @@ import {
 } from "@ionic/react";
 
 import InfoCard from "../../components/InfoCard";
-import { getProjects } from "../../api/api";
+import useApi from "../../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { Tab, Table } from "@mui/material";
 import useColumns from "../../hooks/useColumns";
 import TableCard from "../../components/TableCard";
 import { useAppContext } from "../../contexts/AppContext";
-import {
-  getFilteredDetailChargeTableByLotAndAvenant,
-  getFilteredDetailChargeTableByLotAndProduitAndAvenant,
-  getFilteredDetailChargeTableByProduitAndAvenant,
-  getFilteredDetailChargeTableByTacheAndAvenant,
-  getFilteredDetailDelaiTableByLotAndAvenant,
-  getFilteredDetailDelaiTableByLotAndProduitAndAvenant,
-  getFilteredDetailDelaiTableByProduitAndAvenant,
-  getFilteredDetailDelaiTableByTacheAndAvenant,
-  getFilteredDetailProduitTableByLotAndAvenant,
-  getFilteredDetailProduitTableByLotAndProduitAndAvenant,
-  getFilteredDetailProduitTableByProduitAndAvenant,
-  getFilteredDetailProduitTableByTacheAndAvenant,
-  getFilteredDetailQualiteTableByLotAndAvenant,
-  getFilteredDetailQualiteTableByLotAndProduitAndAvenant,
-  getFilteredDetailQualiteTableByProduitAndAvenant,
-  getFilteredDetailQualiteTableByTacheAndAvenant,
-} from "../../api/detail_api";
+import useDetailApi from "../../api/detail_api";
 import {
   Navigate,
   useLocation,
@@ -47,6 +30,25 @@ import BackButton from "../../components/BackButton";
 import PageHeader from "../../components/PageHeader";
 
 const Details: React.FC = () => {
+  const {
+    getFilteredDetailChargeTableByLotAndAvenant,
+    getFilteredDetailChargeTableByLotAndProduitAndAvenant,
+    getFilteredDetailChargeTableByProduitAndAvenant,
+    getFilteredDetailChargeTableByTacheAndAvenant,
+    getFilteredDetailDelaiTableByLotAndAvenant,
+    getFilteredDetailDelaiTableByLotAndProduitAndAvenant,
+    getFilteredDetailDelaiTableByProduitAndAvenant,
+    getFilteredDetailDelaiTableByTacheAndAvenant,
+    getFilteredDetailProduitTableByLotAndAvenant,
+    getFilteredDetailProduitTableByLotAndProduitAndAvenant,
+    getFilteredDetailProduitTableByProduitAndAvenant,
+    getFilteredDetailProduitTableByTacheAndAvenant,
+    getFilteredDetailQualiteTableByLotAndAvenant,
+    getFilteredDetailQualiteTableByLotAndProduitAndAvenant,
+    getFilteredDetailQualiteTableByProduitAndAvenant,
+    getFilteredDetailQualiteTableByTacheAndAvenant,
+  } = useDetailApi();
+  const { getProjects } = useApi();
   const route = useLocation();
   const navigate = useNavigate();
   const { infoproduit, setInfoProduit } = useAppContext();

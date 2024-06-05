@@ -1,13 +1,18 @@
-import React from 'react'
-import AchatElemInstance from '../AchatElemInstance'
-import { getFactures } from '../../../api/achat/achat_api'
+import React from "react";
+import AchatElemInstance from "../AchatElemInstance";
+import useAchatApi from "../../../api/achat/achat_api";
 
-type Props = {}
+type Props = {};
 
-const InstancesFcf:React.FC = (props: Props) => {
+const InstancesFcf: React.FC = (props: Props) => {
+  const { getFactures } = useAchatApi();
   return (
-    <AchatElemInstance FetchFct={getFactures} PathTo='/fcf/info' tableName='fcf'/>
-  )
-}
+    <AchatElemInstance
+      FetchFct={getFactures}
+      PathTo="/fcf/info"
+      tableName="fcf"
+    />
+  );
+};
 
-export default InstancesFcf
+export default InstancesFcf;

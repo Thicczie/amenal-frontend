@@ -17,7 +17,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 
-import { getBesoins } from "../../../api/achat/achat_api";
+import useAchatApi from "../../../api/achat/achat_api";
 import useColumns from "../../../hooks/useColumns";
 import InfoCard from "../../../components/TableCard";
 import Table from "../../../components/Table";
@@ -26,6 +26,7 @@ import AchatElemInstance from "../AchatElemInstance";
 type Props = {};
 
 const InstancesBsn: React.FC = (props: Props) => {
+  const { getBesoins } = useAchatApi();
   //     const besoins = useQuery({
   //     queryKey: ['besoins'],
   //     queryFn: getBesoins,

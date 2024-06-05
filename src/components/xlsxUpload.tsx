@@ -1,17 +1,9 @@
 import React, { useState, useRef, useImperativeHandle, useEffect } from "react";
 
-import {
-  getMetresByAvenantId,
-  saveAllLots,
-  saveAllProduits,
-  saveAllTaches,
-  saveLot,
-  saveProduit,
-  saveTache,
-} from "../api/crudAPI";
+import useCrudApi from "../api/crudAPI";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getProjects } from "../api/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useAppContext } from "../contexts/AppContext";
 import {
   IonButton,
@@ -35,31 +27,15 @@ import * as XLSX from "xlsx";
 import { Dialog } from "@capacitor/dialog";
 import { IonModal } from "@ionic/react";
 
-import {
-  produitFields,
-  lotFields,
-  tacheFields,
-  detailProduitFields,
-  detailChargeFields,
-  detailDelaiFields,
-  detailQualiteFields,
-} from "../constants/FormFields";
+import useFormFields from "../constants/FormFields";
 import { LinearProgress, MenuItem } from "@mui/material";
 import CheckboxSelectionModal from "./CheckboxSelectionModal";
-import {
-  getDetailChargeAttentesByAvenantId,
-  getDetailDelaiAttentesByAvenantId,
-  getDetailProduitAttentesByAvenantId,
-  getDetailQualiteAttentesByAvenantId,
-  saveAllDetailChargeAttentes,
-  saveAllDetailDelaiAttentes,
-  saveAllDetailProduitAttentes,
-  saveAllDetailQualiteAttentes,
-} from "../api/detail_api";
+import useDetailApi from "../api/detail_api";
 import { AssignmentReturnTwoTone } from "@mui/icons-material";
 import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
 import toast from "react-hot-toast";
+import useApi from "../api/api";
 
 interface XLSXUploadProps {
   handleCloseMenu?: () => void;
@@ -76,11 +52,43 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
     },
   }));
 
+  const { getProjects } = useApi();
+  const {
+    getMetresByAvenantId,
+    saveAllLots,
+    saveAllProduits,
+    saveAllTaches,
+    saveLot,
+    saveProduit,
+    saveTache,
+  } = useCrudApi();
+  const {
+    getDetailChargeAttentesByAvenantId,
+    getDetailDelaiAttentesByAvenantId,
+    getDetailProduitAttentesByAvenantId,
+    getDetailQualiteAttentesByAvenantId,
+    saveAllDetailChargeAttentes,
+    saveAllDetailDelaiAttentes,
+    saveAllDetailProduitAttentes,
+    saveAllDetailQualiteAttentes,
+  } = useDetailApi();
+  const {
+    produitFields,
+    lotFields,
+    tacheFields,
+    detailProduitFields,
+    detailChargeFields,
+    detailDelaiFields,
+    detailQualiteFields,
+  } = useFormFields();
+
   const { avenantId, projectId, currentTable } = useAppContext();
 
   const sheetSelectRef = useRef<HTMLIonModalElement>(null);
   const [sheetNamesRef, setsheetNamesRef] = useState<any[]>([]);
   const [xlsxData, setXlsxData] = useState<any[]>([]);
+
+  const queryClient = useQueryClient();
 
   const selectedMetre = useRef();
   const [metreModal, setMetreModal] = useState(false);
@@ -122,8 +130,22 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
     },
     onSettled(data, error, variables, context) {
       setLoading(false);
-      if (data?.status == 400) BadReqArray.push(variables?.data);
-      if (data?.status == 409) DuplicatesArray.push(variables?.data);
+      //if (data?.status == 400) BadReqArray.push(variables?.data);
+      //if (data?.status == 409) DuplicatesArray.push(variables?.data);
+
+      if (data?.status == 200 || data?.status == 201) {
+        toast.success("Importation reussie");
+      } else if (data?.status == 401 || data?.status == 409) {
+        toast.error("Les enregistrements existent déjà");
+      } else if (data?.status == 403) {
+        toast.error("Accès non autorisé");
+      } else {
+        toast.error("Erreur! " + data?.originalError?.message, {
+          style: {
+            zIndex: 1000,
+          },
+        });
+      }
     },
   });
 
@@ -251,6 +273,7 @@ const XLSXUpload: React.FC<XLSXUploadProps> = ({
     //   }
 
     toast.success(element + " importé(e)s ", { id: element, duration: 0 });
+    queryClient.invalidateQueries();
   };
 
   // Function to rename array keys to match specifications

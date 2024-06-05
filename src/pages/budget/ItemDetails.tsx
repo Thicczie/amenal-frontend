@@ -18,14 +18,7 @@ import {
 } from "@ionic/react";
 import React, { useEffect } from "react";
 
-import {
-  getProduitTableByAvenantId,
-  getLotTableByAvenantId,
-  getTacheTableByAvenantId,
-  getSigmaLotTable,
-  getSigmaProduitTable,
-  getSigmaTacheTable,
-} from "../../api/api";
+import useApi from "../../api/api";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import TableCard from "../../components/TableCard";
 import useColumns from "../../hooks/useColumns";
@@ -34,49 +27,11 @@ import { useAppContext } from "../../contexts/AppContext";
 import { Button, Tab, Tabs } from "@mui/material";
 import ButtonList from "../../components/buttonList";
 import TableSelect from "../../components/TableSelect";
-import {
-  getFilteredDetailChargeTableByLotAndAvenant,
-  getFilteredDetailChargeTableByLotAndProduitAndAvenant,
-  getFilteredDetailChargeTableByLotAndProject,
-  getFilteredDetailChargeTableByProduitAndAvenant,
-  getFilteredDetailChargeTableByProduitAndLotAndProject,
-  getFilteredDetailChargeTableByProduitAndProject,
-  getFilteredDetailChargeTableByTacheAndAvenant,
-  getFilteredDetailChargeTableByTacheAndProject,
-  getFilteredDetailDelaiTableByLotAndAvenant,
-  getFilteredDetailDelaiTableByLotAndProduitAndAvenant,
-  getFilteredDetailDelaiTableByLotAndProject,
-  getFilteredDetailDelaiTableByProduitAndAvenant,
-  getFilteredDetailDelaiTableByProduitAndLotAndProject,
-  getFilteredDetailDelaiTableByProduitAndProject,
-  getFilteredDetailDelaiTableByTacheAndAvenant,
-  getFilteredDetailDelaiTableByTacheAndProject,
-  getFilteredDetailProduitTableByLotAndAvenant,
-  getFilteredDetailProduitTableByLotAndProduitAndAvenant,
-  getFilteredDetailProduitTableByLotAndProject,
-  getFilteredDetailProduitTableByProduitAndAvenant,
-  getFilteredDetailProduitTableByProduitAndLotAndProject,
-  getFilteredDetailProduitTableByProduitAndProject,
-  getFilteredDetailProduitTableByTacheAndAvenant,
-  getFilteredDetailProduitTableByTacheAndProject,
-  getFilteredDetailQualiteTableByLotAndAvenant,
-  getFilteredDetailQualiteTableByLotAndProduitAndAvenant,
-  getFilteredDetailQualiteTableByLotAndProject,
-  getFilteredDetailQualiteTableByProduitAndAvenant,
-  getFilteredDetailQualiteTableByProduitAndLotAndProject,
-  getFilteredDetailQualiteTableByProduitAndProject,
-  getFilteredDetailQualiteTableByTacheAndAvenant,
-  getFilteredDetailQualiteTableByTacheAndProject,
-} from "../../api/detail_api";
+import useDetailApi from "../../api/detail_api";
 import SigmaCheckbox from "../../components/SigmaCheckbox";
 import { AvLayout, AvTitleLayout } from "../../constants/infoLayout";
 import AddDialogButton from "../../components/AddDialogButton";
-import {
-  detailProduitFormFields,
-  lotFields,
-  produitFields,
-  tacheFields,
-} from "../../constants/FormFields";
+import useFormFields from "../../constants/FormFields";
 import BackButton from "../../components/BackButton";
 import { Outlet, useMatch, useNavigate, useParams } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
@@ -87,6 +42,50 @@ type Props = {
 
 //this is the AV screen
 const Content: React.FC<Props> = ({ isComponentParent }) => {
+  const { detailProduitFormFields, lotFields, produitFields, tacheFields } =
+    useFormFields();
+  const {
+    getProduitTableByAvenantId,
+    getLotTableByAvenantId,
+    getTacheTableByAvenantId,
+    getSigmaLotTable,
+    getSigmaProduitTable,
+    getSigmaTacheTable,
+  } = useApi();
+  const {
+    getFilteredDetailChargeTableByLotAndAvenant,
+    getFilteredDetailChargeTableByLotAndProduitAndAvenant,
+    getFilteredDetailChargeTableByLotAndProject,
+    getFilteredDetailChargeTableByProduitAndAvenant,
+    getFilteredDetailChargeTableByProduitAndLotAndProject,
+    getFilteredDetailChargeTableByProduitAndProject,
+    getFilteredDetailChargeTableByTacheAndAvenant,
+    getFilteredDetailChargeTableByTacheAndProject,
+    getFilteredDetailDelaiTableByLotAndAvenant,
+    getFilteredDetailDelaiTableByLotAndProduitAndAvenant,
+    getFilteredDetailDelaiTableByLotAndProject,
+    getFilteredDetailDelaiTableByProduitAndAvenant,
+    getFilteredDetailDelaiTableByProduitAndLotAndProject,
+    getFilteredDetailDelaiTableByProduitAndProject,
+    getFilteredDetailDelaiTableByTacheAndAvenant,
+    getFilteredDetailDelaiTableByTacheAndProject,
+    getFilteredDetailProduitTableByLotAndAvenant,
+    getFilteredDetailProduitTableByLotAndProduitAndAvenant,
+    getFilteredDetailProduitTableByLotAndProject,
+    getFilteredDetailProduitTableByProduitAndAvenant,
+    getFilteredDetailProduitTableByProduitAndLotAndProject,
+    getFilteredDetailProduitTableByProduitAndProject,
+    getFilteredDetailProduitTableByTacheAndAvenant,
+    getFilteredDetailProduitTableByTacheAndProject,
+    getFilteredDetailQualiteTableByLotAndAvenant,
+    getFilteredDetailQualiteTableByLotAndProduitAndAvenant,
+    getFilteredDetailQualiteTableByLotAndProject,
+    getFilteredDetailQualiteTableByProduitAndAvenant,
+    getFilteredDetailQualiteTableByProduitAndLotAndProject,
+    getFilteredDetailQualiteTableByProduitAndProject,
+    getFilteredDetailQualiteTableByTacheAndAvenant,
+    getFilteredDetailQualiteTableByTacheAndProject,
+  } = useDetailApi();
   const { currentTable, setCurrentTable, infoproduit } = useAppContext();
   const { currentCharge, currentSigma, setInfoProduit } = useAppContext();
   const { projectId, avenantId }: any = useParams();
@@ -199,10 +198,6 @@ const Content: React.FC<Props> = ({ isComponentParent }) => {
     setRowId(null);
     setInfoProduit({ idproduit: null, designationProduit: null });
   }, [currentTable, currentSigma]);
-
-  useEffect(() => {
-    console.log("RERENDER");
-  }, []);
 
   //sigma :false
   const loadCharges = (

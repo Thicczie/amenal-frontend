@@ -1,14 +1,13 @@
-import React from 'react'
-import Ajout from '../Ajout'
-import { budgetFields, tacheFields } from '../../constants/FormFields'
+import React from "react";
+import Ajout from "../Ajout";
+import useFormFields from "../../constants/FormFields";
 
-type Props = {}
+type Props = {};
 
-const AjoutBdg:React.FC = (props: Props) => {
-  return (
-    <Ajout FormName="budget" formFields={budgetFields} />
-  
-  )
-}
+const AjoutBdg: React.FC = (props: Props) => {
+  const { budgetFields } = useFormFields();
 
-export default AjoutBdg
+  return <Ajout FormName="budget" formFields={budgetFields} />;
+};
+
+export default AjoutBdg;

@@ -21,7 +21,7 @@ import Table from "../../components/Table";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getProjects } from "../../api/api";
+import useApi from "../../api/api";
 import { ApiResponse } from "apisauce";
 import { MRT_ColumnDef } from "material-react-table";
 import useColumns from "../../hooks/useColumns";
@@ -38,6 +38,7 @@ const Instances: React.FC = () => {
   //const route =useIonRouter();
   const location = useLocation();
   const navigate = useNavigate();
+  const { getProjects } = useApi();
 
   const { isPending, isError, data, error, isFetching } = useQuery({
     queryKey: ["projets"],
@@ -60,18 +61,18 @@ const Instances: React.FC = () => {
     (data?.data as any[]).forEach((item: any) => {
       const { id, refProject, project, observation, dateOuverture } = item;
 
-      if (
-        id !== null &&
-        refProject !== null &&
-        project !== null &&
-        observation !== null &&
-        dateOuverture !== null
-      ) {
-        Projects.push({ id, refProject, project, observation, dateOuverture });
-      }
+      // if (
+      //   id !== null &&
+      //   refProject !== null &&
+      //   project !== null &&
+      //   observation !== null &&
+      //   dateOuverture !== null
+      // ) {
+      Projects.push({ id, refProject, project, observation, dateOuverture });
+      //}
     });
 
-    return Object.keys(Projects[0]).map((value: string) => ({
+    return Object.keys(Projects[0] ?? [])?.map((value: string) => ({
       accessorKey: value,
       header:
         value?.toString().charAt(0).toUpperCase() + value?.toString().slice(1), // You may modify this to customize the header representation of the value

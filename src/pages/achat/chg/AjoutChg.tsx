@@ -1,14 +1,13 @@
-import React from 'react';
-import Ajout from '../../Ajout';
-import { chgFields } from '../../../constants/FormFields';
+import React from "react";
+import Ajout from "../../Ajout";
+import useFormFields from "../../../constants/FormFields";
 
-type Props = {}
+type Props = {};
 
-const AjoutChg:React.FC = (props: Props) => {
-  return (
-    <Ajout FormName="chargeStandard" formFields={chgFields} />
-  
-  )
-}
+const AjoutChg: React.FC = (props: Props) => {
+  const { chgFields } = useFormFields();
 
-export default AjoutChg
+  return <Ajout FormName="chargeStandard" formFields={chgFields} />;
+};
+
+export default AjoutChg;

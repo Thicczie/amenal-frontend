@@ -35,6 +35,7 @@ interface InfoCardProps {
   HeaderContent?: JSX.Element;
   enableXlsxUpload?: boolean;
   tableName: string;
+  minimal?: boolean;
 }
 
 const TableCard: React.FC<InfoCardProps> = ({
@@ -54,9 +55,10 @@ const TableCard: React.FC<InfoCardProps> = ({
   HeaderContent,
   enableXlsxUpload,
   tableName,
+  minimal,
 }) => {
   const { currentCharge, setCurrentCharge } = useAppContext();
-  console.log("tablename", tableName);
+  //  console.log("tablename", tableName);
 
   return (
     <Card
@@ -102,6 +104,7 @@ const TableCard: React.FC<InfoCardProps> = ({
             enableFilterByCharge={enableFilterByCharge}
             enableXlsxUpload={enableXlsxUpload}
             tableName={tableName}
+            minimal={minimal}
           />
         ) : isError ? (
           <IonLabel color={"danger"}>Erreur</IonLabel>

@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import { QueryKey, useQuery } from "@tanstack/react-query";
 
-import {
-  getChartDataByAvenantIdAndTacheIds,
-  getChartDataByAvenantIdAndLots,
-  getChartDataByAvenantIdAndProduits,
-  getChartDataByProjectIdAndLots,
-  getChartDataByProjectIdAndProduits,
-  getChartDataByProjectIdAndTacheIds,
-  
-} from '../api/chart_api'
+import useChartApi from "../api/chart_api";
 
 import {
   Radio,
@@ -25,74 +17,82 @@ import { useAppContext } from "../contexts/AppContext";
 import { IonSpinner } from "@ionic/react";
 import { useLocation } from "react-router-dom";
 
-
-
-interface chartProps{
-  tableRows:any[];
-  avenantId:number|string|null|undefined;
-  projectId:number|string|null|undefined;
-
+interface chartProps {
+  tableRows: any[];
+  avenantId: number | string | null | undefined;
+  projectId: number | string | null | undefined;
 }
 
 // const Line = ({ avenantId, charge, tacheIds }) => {
-const Chart:React.FC <chartProps> = ({tableRows , avenantId , projectId}) => {
+const Chart: React.FC<chartProps> = ({ tableRows, avenantId, projectId }) => {
+  const {
+    getChartDataByAvenantIdAndTacheIds,
+    getChartDataByAvenantIdAndLots,
+    getChartDataByAvenantIdAndProduits,
+    getChartDataByProjectIdAndLots,
+    getChartDataByProjectIdAndProduits,
+    getChartDataByProjectIdAndTacheIds,
+  } = useChartApi();
   const [isCum, setIsCum] = useState(true);
   const [isQte, setIsQte] = useState(true);
   const [isPonc, setIsPonc] = useState(true);
-
-
-
-
-  
+  const [isRelatif, setIsRelatif] = useState(true);
 
   //TODO : change these values with the real ones
 
-
-
-  const {currentCharge , currentSigma , currentTable }= useAppContext();
+  const { currentCharge, currentSigma, currentTable } = useAppContext();
 
   //get chart data:
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["chartData", avenantId, currentCharge] as QueryKey,
-    queryFn: () =>  loadChartData(avenantId, currentCharge , projectId)
+    queryFn: () => loadChartData(avenantId, currentCharge, projectId),
   });
 
-
-
-  const loadChartData = (avenantId: number|string|null|undefined, charge: string |null , projectId:number|string|null|undefined ) => {
-
-
+  const loadChartData = (
+    avenantId: number | string | null | undefined,
+    charge: string | null,
+    projectId: number | string | null | undefined
+  ) => {
     switch (currentTable) {
-      case'produit':
-      
-      const designationsList :string[] = tableRows?.map((row: any) => row.designation);
-      if (designationsList.length === 0) return null;
-      if(currentSigma) return getChartDataByProjectIdAndProduits(projectId, charge , designationsList);
-      return getChartDataByAvenantIdAndProduits(avenantId, charge , designationsList);
-      case 'lot':
+      case "produit":
+        const designationsList: string[] = tableRows?.map(
+          (row: any) => row.designation
+        );
+        if (designationsList.length === 0) return null;
+        if (currentSigma)
+          return getChartDataByProjectIdAndProduits(
+            projectId,
+            charge,
+            designationsList
+          );
+        return getChartDataByAvenantIdAndProduits(
+          avenantId,
+          charge,
+          designationsList
+        );
+      case "lot":
+        const lotList: string[] = tableRows?.map((row: any) => row.designation);
+        if (lotList.length === 0) return null;
+        if (currentSigma)
+          return getChartDataByProjectIdAndLots(projectId, charge, lotList);
+        return getChartDataByAvenantIdAndLots(avenantId, charge, lotList);
+      case "tache":
+        const tacheIds: number[] = tableRows?.map((row: any) => row.id);
+        if (tacheIds.length === 0) return null;
+        if (currentSigma)
+          return getChartDataByProjectIdAndTacheIds(
+            projectId,
+            charge,
+            tacheIds
+          );
+        return getChartDataByAvenantIdAndTacheIds(avenantId, charge, tacheIds);
 
-        const lotList:string [] = tableRows?.map((row: any) => row.lot);
-      if (lotList.length === 0) return null;
-      if(currentSigma) return getChartDataByProjectIdAndLots(projectId,charge,lotList)
-      return getChartDataByAvenantIdAndLots(avenantId,charge,lotList)
-      case 'tache':
-
-      const tacheIds:number[]= tableRows?.map((row: any) => row.id);
-      if (tacheIds.length === 0) return null;
-      if(currentSigma)return getChartDataByProjectIdAndTacheIds(projectId,charge,tacheIds)
-      return getChartDataByAvenantIdAndTacheIds(avenantId,charge,tacheIds)
-
-      default : 
-      break ;
+      default:
+        break;
     }
+  };
 
-
-  }
-
-
-
-
-  if ( isLoading) return <IonSpinner name="crescent" />;  
+  if (isLoading) return <IonSpinner name="crescent" />;
   if (isError) return <div>Error: {error.message}</div>;
 
   //prepare data for chart:
@@ -138,20 +138,19 @@ const Chart:React.FC <chartProps> = ({tableRows , avenantId , projectId}) => {
   });
 
   const CurChart = () => {
-    if (isCum) return <LineChart data={mergedLineChartData ?? [] } />;
+    if (isCum) return <LineChart data={mergedLineChartData ?? []} />;
     else return <BarChart data={mergedLineChartData ?? []} />;
   };
 
   return (
-    <div className="  p-10 bg-white dark:bg-ion-dark rounded-3xl">
-      <ChartsHeader title="BDG"  />
+    <div className="  p-10  rounded-3xl">
+      <ChartsHeader title="BDG" />
       <div className="w-full">
         <CurChart />
       </div>
       <div className="w-full mt-10 flex flex-row flex-wrap ">
         <div className="radiobutton-control">
           <FormControl component="fieldset">
-            
             <RadioGroup
               aria-label="Cumulatif/Journaliere"
               name="isCum"
@@ -174,7 +173,6 @@ const Chart:React.FC <chartProps> = ({tableRows , avenantId , projectId}) => {
 
         <div className="radiobutton-control">
           <FormControl component="fieldset">
-            
             <RadioGroup
               aria-label="Ponctuelle/Lisse"
               name="isPonc"
@@ -197,7 +195,6 @@ const Chart:React.FC <chartProps> = ({tableRows , avenantId , projectId}) => {
 
         <div className="radiobutton-control">
           <FormControl component="fieldset">
-          
             <RadioGroup
               aria-label="Qte/Mantant"
               name="isQte"
@@ -209,6 +206,28 @@ const Chart:React.FC <chartProps> = ({tableRows , avenantId , projectId}) => {
                 value={false}
                 control={<Radio />}
                 label="Mantant"
+              />
+            </RadioGroup>
+          </FormControl>
+        </div>
+
+        <div className="radiobutton-control">
+          <FormControl component="fieldset">
+            <RadioGroup
+              aria-label="relatif/absolu"
+              name="isRelatif"
+              value={isRelatif}
+              onChange={(e) => setIsRelatif(e.target.value === "true")}
+            >
+              <FormControlLabel
+                value={true}
+                control={<Radio />}
+                label="Relatif"
+              />
+              <FormControlLabel
+                value={false}
+                control={<Radio />}
+                label="Absolu"
               />
             </RadioGroup>
           </FormControl>

@@ -1,268 +1,191 @@
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  ReactNode,
-  useContext,
-} from "react";
-import { login, refreshToken as RefreshToken } from "../api/auth/auth_api";
-import apiClient from "../api/apiClient";
-import { isPlatform } from "@ionic/react";
-import { CapacitorCookies } from "@capacitor/core";
-import { useCookies } from "react-cookie";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
+type userCredentials = {
+  email: string;
+  firstname: string;
+  lastname: string;
+  role: string;
+};
 
 interface AuthContextType {
-  authTokens: string | null;
-  userCredentials: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-  } | null;
-  Login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  AuthToken: string | null;
+  RefreshToken: string | null;
+  setRefreshToken: (token: string | null) => void;
+  setAuthTokens: (token: string | null) => void;
+  setUserCredentials: (userCredentials: userCredentials) => void;
+  userCredentials: userCredentials | null;
+  isReady: boolean;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-);
+export const AuthContext = createContext({} as AuthContextType);
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [cookies, setCookie, removeCookie] = useCookies();
-
-  // const [authTokens, setAuthTokens] = useState<string | null>(() => {
-  //   const token =  getDeviceCookie("access_token");
-  //   return token;
-  // });
-
-  // const [refreshToken, setRefreshToken] = useState<string | null>(() => {
-  //   const token = getDeviceCookie("access_token");
-  //   return token;
-  // });
-
-  const [authTokens, setAuthTokens] = useState<string | null>(null);
-
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
-
+  const [AuthToken, setAuthTokens] = useState<string | null>(
+    localStorage.getItem("access_token") || null
+  );
+  const [refreshToken, setRefreshToken] = useState<string | null>();
+  const [isReady, setIsReady] = useState<boolean>(false);
   const [userCredentials, setUserCredentials] = useState<{
     email: string;
-    firstName: string;
-    lastName: string;
+    firstname: string;
+    lastname: string;
     role: string;
   } | null>();
 
   // useEffect(() => {
-  //   const checkTokenExpiry = async () => {
+  //   //fetch token stored in cookies and set it in state if available
+  //   async function fetchDeviceTokens() {
+  //     setIsFetchingtokens(true);
+  //     var tkns;
+  //     return await fetchTokens();
+  //     //then((data) => {
+  //     //   tkns = data;
+  //     //   // setAuthTokens(tkns?.accToken);
+  //     //   // setRefreshToken(tkns?.refToken);
+  //     //   setAuthTokens(tkns?.accToken);
+  //     //   setRefreshToken(tkns?.refToken);
+  //     // });
+  //   }
+  //   fetchDeviceTokens().then((data) => {
+  //     setAuthTokens(data?.accToken);
+  //     setRefreshToken(data?.refToken);
+  //     setIsFetchingtokens(false);
+  //   });
+  //   console.log("bachirex", AuthToken);
+  // }, [AuthToken]);
+
+  // useEffect(() => {
+  //   // Fetch tokens stored in cookies and set them in state if available
+  //   async function fetchDeviceTokens() {
   //     try {
-  //       const accessToken = await getDeviceCookie("access_token");
-  //       if (!accessToken) {
-  //         throw new Error("Access token not found");
-  //       }
-
-  //       const decodedToken = parseJwt(accessToken);
-  //       console.log(
-  //         "Decoded token:",
-  //         decodedToken,
-  //         "\n before decode ",
-  //         accessToken
-  //       );
-
-  //       const expiryTime = decodedToken.exp * 1000; // Convert to milliseconds
-
-  //       const timeToExpiry = expiryTime - Date.now();
-  //       const refreshTime = 1 * 60 * 1000; // 5 minutes before expiry
-  //       // console.log(
-  //       //   "Decoded token:",
-  //       //   decodedToken,
-  //       //   "timeToExpiry",
-  //       //   timeToExpiry,
-  //       //   "refreshTime",
-  //       //   refreshTime
-  //       // );
-
-  //       if (timeToExpiry < refreshTime) {
-  //         const response = await refreshAccessToken();
-  //         console.log("Refreshed access token:", response);
-  //       }
+  //       const tokens = await fetchTokens();
+  //       setAuthTokens(tokens?.accToken ?? null);
+  //       setRefreshToken(tokens?.refToken ?? null);
+  //       const decodedAccessToken = parseJwt(tokens?.accToken ?? "");
+  //       setUserCredentials((prev) => ({
+  //         ...prev,
+  //         email: decodedAccessToken?.sub, // replace with email
+  //         firstname: decodedAccessToken?.firstname,
+  //         lastname: decodedAccessToken?.lastname,
+  //         role: decodedAccessToken?.role,
+  //       }));
   //     } catch (error) {
-  //       console.error("Error checking token expiry:", error);
+  //       console.error("Error fetching tokens:", error);
+  //     } finally {
+  //       setIsReady(true);
   //     }
-  //   };
-
+  //   }
   //   fetchDeviceTokens();
+  // }, []);
 
-  //   //const interval2 = setInterval(fetchAuthTokens, 5 * 1000);
-  //   const interval = setInterval(checkTokenExpiry, 5 * 1000); // Check every minute for token expiry
+  // useEffect(() => {
+  //   checkTokenExpiry();
+  //   const interval = setInterval(checkTokenExpiry, 5 * 60 * 1000); // Check every 5 minutes for token expiry
   //   return () => {
   //     clearInterval(interval);
-  //     //clearInterval(interval2);
   //   };
   // }, []);
 
-  const fetchTokens = async () => {
-    try {
-      console.log("fetchingTokens...");
+  // useEffect(() => {
+  //   apiClient.addResponseTransform((response) => {
+  //     if (response.status === 403) {
+  //       refreshAccessToken();
+  //     }
+  //   });
+  // }, []);
 
-      const accessToken = await getDeviceCookie("access_token");
-      const refreshToken = await getDeviceCookie("refresh_token");
-      setAuthTokens(accessToken);
-      setRefreshToken(refreshToken);
-    } catch (error) {
-      console.error("Error fetching tokens:", error);
-    }
-  };
+  // const checkTokenExpiry = async () => {
+  //   try {
+  //     const accessToken = localStorage.getItem("access_token");
+  //     var refToken;
+  //     if (!accessToken) {
+  //       refToken = await getDeviceCookie("refresh_token");
+  //       if (!refToken)
+  //         throw new Error("No access token or refresh token found");
+  //       else {
+  //         refreshAccessToken();
+  //         return;
+  //       }
+  //     }
 
-  const fetchDeviceTokens = async () => {
-    await fetchTokens();
-  };
+  //     const decodedToken = parseJwt(accessToken);
+  //     // console.log(
+  //     //   "Decoded token:",
+  //     //   decodedToken,
+  //     //   "\n before decode ",
+  //     //   accessToken
+  //     // );
 
-  const Login = async (email: string, password: string) => {
-    const response = await login({ email: email, password: password });
-    if (response.ok) {
-      console.log("Login successful:", response);
+  //     const expiryTime = decodedToken.exp * 1000; // Convert to milliseconds
 
-      const data: any = response?.data;
-      const decodedAccessToken = parseJwt(data?.access_token);
-      setAuthTokens(data?.access_token);
-      setRefreshToken(data?.refresh_token);
-      setUserCredentials((prev) => ({
-        ...prev,
-        email: decodedAccessToken?.sub, // replace with email
-        firstName: decodedAccessToken?.firstName,
-        lastName: decodedAccessToken?.lastName,
-        role: decodedAccessToken?.role,
-      }));
-      //replace with cookies
-      // localStorage.setItem("access_token", data?.access_token);
-      // localStorage.setItem("refresh_token", data?.refresh_token);
-      setDeviceCookie("access_token", data?.access_token);
-      setDeviceCookie("refresh_token", data?.refresh_token);
+  //     const timeToExpiry = expiryTime - Date.now();
+  //     const refreshTime = 1 * 60 * 1000; // 5 minutes before expiry
+  //     // console.log(
+  //     //   "Decoded token:",
+  //     //   decodedToken,
+  //     //   "timeToExpiry",
+  //     //   timeToExpiry,
+  //     //   "refreshTime",
+  //     //   refreshTime
+  //     // );
 
-      apiClient.setHeaders({
-        Authorization: `Bearer ${data?.access_token}`,
-      });
-      return true;
-    } else {
-      console.error("Login failed:", response);
-      return false;
-    }
-  };
+  //     if (timeToExpiry < refreshTime) {
+  //       const response = await refreshAccessToken();
+  //       console.log("Refreshed access token:", response);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error checking token expiry:", error);
+  //   }
+  // };
 
-  const logout = () => {
-    setAuthTokens(null);
-    setRefreshToken(null);
-    // localStorage.removeItem("access_token");
-    // localStorage.removeItem("refresh_token");
-    removeDeviceCookie("access_token");
-    removeDeviceCookie("refresh_token");
-    apiClient.deleteHeader("Authorization");
-    //refreshAccessToken();
-  };
+  // const refrehAccessToken = async (): Promise<void> => {
+  //   try {
+  //     const oldRefreshToken = await getDeviceCookie("refresh_token");
+  //     if (!oldRefreshToken) {
+  //       throw new Error("Refresh token not found");
+  //     }
+  //     //console.log("Refreshing access token...", oldRefreshToken);
 
-  const setDeviceCookie = async (
-    name: string,
-    value: string,
-    options?: any
-  ) => {
-    const tokenExists = await getDeviceCookie(name);
-    if (tokenExists) {
-      setAuthTokens(value);
-      setRefreshToken(value);
-    }
-    if (isPlatform("hybrid")) {
-      await CapacitorCookies.setCookie({
-        url: "/",
-        key: name,
-        value: value,
-      });
-    } else {
-      setCookie(name, value, options);
-    }
-  };
+  //     const response = await RefreshToken(oldRefreshToken);
 
-  const getDeviceCookie = async (name: string): Promise<string | null> => {
-    if (isPlatform("hybrid")) {
-      const cookie = await CapacitorCookies.getCookies();
-
-      return cookie[name] || null;
-    } else {
-      return cookies[name] || null;
-    }
-  };
-
-  const removeDeviceCookie = async (name: string) => {
-    if (isPlatform("hybrid")) {
-      await CapacitorCookies.deleteCookie({
-        url: "/",
-        key: name,
-      });
-    } else {
-      removeCookie(name);
-    }
-  };
-
-  const refreshAccessToken = async (): Promise<void> => {
-    try {
-      const oldRefreshToken = await getDeviceCookie("refresh_token");
-      if (!oldRefreshToken) {
-        throw new Error("Refresh token not found");
-      }
-      //console.log("Refreshing access token...", oldRefreshToken);
-
-      const response = await RefreshToken(oldRefreshToken);
-
-      if (response?.ok) {
-        console.log("Refreshed access token:", response);
-        const data: any = response?.data;
-        setAuthTokens(data?.access_token);
-        setRefreshToken(data?.refresh_token);
-        //replace with cookies
-        // localStorage.setItem("access_token", data?.access_token);
-        // localStorage.setItem("refresh_token", data?.refresh_token);
-        setDeviceCookie("access_token", data?.access_token);
-        setDeviceCookie("refresh_token", data?.refresh_token);
-        apiClient.setHeaders({
-          Authorization: `Bearer ${data?.access_token}`,
-        });
-      } else {
-        // Handle refresh token failure
-        throw new Error("Failed to refresh access token");
-      }
-    } catch (error) {
-      // Handle token refresh error
-      console.error("Token refresh failed:", error);
-      logout(); // Log out the user if token refresh fails
-    }
-  };
+  //     if (response?.ok) {
+  //       console.log("Refreshed access token:", response);
+  //       const data: any = response?.data;
+  //       setAuthTokens(data?.access_token);
+  //       setRefreshToken(data?.refresh_token);
+  //       //replace with cookies
+  //       localStorage.setItem("access_token", data?.access_token);
+  //       // localStorage.setItem("refresh_token", data?.refresh_token);
+  //       //setDeviceCookie("access_token", data?.access_token);
+  //       setDeviceCookie("refresh_token", data?.refresh_token);
+  //       apiClient.setHeaders({
+  //         Authorization: `Bearer ${data?.access_token}`,
+  //       });
+  //     } else {
+  //       // Handle refresh token failure
+  //       throw new Error("Failed to refresh access token");
+  //     }
+  //   } catch (error) {
+  //     // Handle token refresh error
+  //     console.error("Token refresh failed:", error);
+  //     logout(); // Log out the user if token refresh fails
+  //   }
+  // };
 
   const contextValue = {
-    authTokens,
+    AuthToken: AuthToken ?? null,
+    RefreshToken: refreshToken ?? null,
     userCredentials: userCredentials ?? null,
-    Login,
-    logout,
+    setAuthTokens,
+    setRefreshToken,
+    setUserCredentials,
+    isReady,
   };
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
-
-function parseJwt(token: string) {
-  var base64Url = token.split(".")[1];
-  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  var jsonPayload = decodeURIComponent(
-    window
-      .atob(base64)
-      .split("")
-      .map(function (c) {
-        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-      })
-      .join("")
-  );
-
-  return JSON.parse(jsonPayload);
-}

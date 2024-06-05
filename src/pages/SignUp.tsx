@@ -72,10 +72,10 @@
 //               <Grid item xs={12} sm={6}>
 //                 <TextField
 //                   autoComplete="given-name"
-//                   name="firstName"
+//                   name="firstname"
 //                   required
 //                   fullWidth
-//                   id="firstName"
+//                   id="firstname"
 //                   label="First Name"
 //                   autoFocus
 //                 />
@@ -84,9 +84,9 @@
 //                 <TextField
 //                   required
 //                   fullWidth
-//                   id="lastName"
+//                   id="lastname"
 //                   label="Last Name"
-//                   name="lastName"
+//                   name="lastname"
 //                   autoComplete="family-name"
 //                 />
 //               </Grid>
@@ -148,7 +148,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -157,7 +157,8 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Form, Formik, useField, useFormik } from "formik";
 import * as yup from "yup";
-import { register } from "../api/auth/auth_api";
+import useAuthApi from "../api/auth/auth_api";
+import useApiClient from "../api/apiClient";
 
 function Copyright(props: any) {
   return (
@@ -181,6 +182,9 @@ function Copyright(props: any) {
 
 export default function SignIn() {
   const [rememberMe, setRememberMe] = React.useState(false);
+  const apiClient = useApiClient();
+  const { register } = useAuthApi(apiClient);
+  const navigate = useNavigate();
 
   const validationSchema = yup.object({
     email: yup
@@ -195,13 +199,13 @@ export default function SignIn() {
       .string()
       .oneOf([yup.ref("password")], "Les mots de passe ne correspondent pas")
       .required("Veuillez confirmer le mot de passe"),
-    firstName: yup.string().required("Prénom est requis"),
-    lastName: yup.string().required("Nom est requis"),
+    firstname: yup.string().required("Prénom est requis"),
+    lastname: yup.string().required("Nom est requis"),
   });
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
+      firstname: "",
+      lastname: "",
       email: "",
       password: "",
       retypePassword: "",
@@ -211,120 +215,156 @@ export default function SignIn() {
       const { retypePassword, ...formData } = values; // remove retypePassword from formData
       console.log(formData);
       register(formData);
+      navigate("/signin");
     },
   });
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
+    <Box
+      sx={{
+        position: "relative",
+        // backgroundImage: 'url("/public/login_bg.jpg")', // Replace with your background image path
+        // backgroundSize: "fit",
+        // backgroundPosition: "center",
+        // //clipPath: "polygon(0 0, 100% 0, 50% 50%, 0 100%)", // Custom clip path
+        // padding: 0, // Remove padding to cover the entire container
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+
+        // filter: "blur(5px)",
+      }}
+    >
       <Box
         sx={{
-          marginTop: 15,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          backgroundImage: 'url("/public/login_bg.jpg")', // Replace with your background image path
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "blur(5px)",
+          zIndex: -1, // Place it behind the content
         }}
-      >
-        <Box sx={{ m: 1 }}>
-          <img src="/Logo.png" alt="logo" width={50} />
+      />
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            backgroundColor: "#fff",
+            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+            padding: "2rem",
+            zIndex: 100,
+          }}
+        >
+          <Box sx={{ m: 1 }}>
+            <img src="/Logo.png" alt="logo" width={50} />
+          </Box>
+          <Typography component="h1" variant="h5">
+            Inscrivez-Vous
+          </Typography>
+          <form onSubmit={formik.handleSubmit}>
+            <Grid container mt={1} spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  id="firstname"
+                  fullWidth
+                  name="firstname"
+                  label="Nom"
+                  autoFocus
+                  value={formik.values.firstname}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.firstname && Boolean(formik.errors.firstname)
+                  }
+                  helperText={
+                    formik.touched.firstname && formik.errors.firstname
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  id="lastname"
+                  fullWidth
+                  name="lastname"
+                  label="Prénom"
+                  value={formik.values.lastname}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.lastname && Boolean(formik.errors.lastname)
+                  }
+                  helperText={formik.touched.lastname && formik.errors.lastname}
+                />
+              </Grid>
+            </Grid>
+            <TextField
+              margin="normal"
+              fullWidth
+              id="email"
+              name="email"
+              label="Email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="password"
+              name="password"
+              label="Mot de Passe"
+              type="password"
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="retypePassword"
+              name="retypePassword"
+              label="Retaper le Mot de Passe"
+              type="password"
+              value={formik.values.retypePassword}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.retypePassword &&
+                Boolean(formik.errors.retypePassword)
+              }
+              helperText={
+                formik.touched.retypePassword && formik.errors.retypePassword
+              }
+            />
+            <Button
+              sx={{ mt: 2 }}
+              color="primary"
+              variant="contained"
+              fullWidth
+              type="submit"
+            >
+              S'inscrire
+            </Button>
+          </form>
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Link to="/signin">Déjà un compte? Se connecter</Link>
+            </Grid>
+          </Grid>
+          <Copyright sx={{ mt: 8, mb: 4 }} />
         </Box>
-        <Typography component="h1" variant="h5">
-          Inscrivez-Vous
-        </Typography>
-        <form onSubmit={formik.handleSubmit}>
-          <Grid container mt={1} spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                id="firstName"
-                fullWidth
-                name="firstName"
-                label="Nom"
-                autoFocus
-                value={formik.values.firstName}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={
-                  formik.touched.firstName && Boolean(formik.errors.firstName)
-                }
-                helperText={formik.touched.firstName && formik.errors.firstName}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                id="lastName"
-                fullWidth
-                name="lastName"
-                label="Prénom"
-                value={formik.values.lastName}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={
-                  formik.touched.lastName && Boolean(formik.errors.lastName)
-                }
-                helperText={formik.touched.lastName && formik.errors.lastName}
-              />
-            </Grid>
-          </Grid>
-          <TextField
-            margin="normal"
-            fullWidth
-            id="email"
-            name="email"
-            label="Email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
-          />
-          <TextField
-            margin="normal"
-            fullWidth
-            id="password"
-            name="password"
-            label="Mot de Passe"
-            type="password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.password && Boolean(formik.errors.password)}
-            helperText={formik.touched.password && formik.errors.password}
-          />
-          <TextField
-            margin="normal"
-            fullWidth
-            id="retypePassword"
-            name="retypePassword"
-            label="Retaper le Mot de Passe"
-            type="password"
-            value={formik.values.retypePassword}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.retypePassword &&
-              Boolean(formik.errors.retypePassword)
-            }
-            helperText={
-              formik.touched.retypePassword && formik.errors.retypePassword
-            }
-          />
-          <Button
-            sx={{ mt: 2 }}
-            color="primary"
-            variant="contained"
-            fullWidth
-            type="submit"
-          >
-            S'inscrire
-          </Button>
-        </form>
-        <Grid container justifyContent="flex-end">
-          <Grid item>
-            <Link to="/signin">Don't have an account? Sign up</Link>
-          </Grid>
-        </Grid>
-      </Box>
-      <Copyright sx={{ mt: 8, mb: 4 }} />
-    </Container>
+      </Container>
+    </Box>
   );
 }

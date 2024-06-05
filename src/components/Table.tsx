@@ -47,7 +47,7 @@ import React from "react";
 
 import { Upload } from "@mui/icons-material";
 import ModifyDialogButton from "./ModifyDialog";
-import { produitFields } from "../constants/FormFields";
+import useFormFields from "../constants/FormFields";
 import DeleteDialogButton from "./DeleteDialogButton";
 import { useLongPress } from "../hooks/useLongPress";
 import { useNavigate } from "react-router-dom";
@@ -64,6 +64,7 @@ interface TableProps {
   enableFilterByCharge?: boolean;
   enableXlsxUpload?: boolean;
   tableName: string;
+  minimal?: boolean;
 }
 
 const Table: React.FC<TableProps> = ({
@@ -78,7 +79,9 @@ const Table: React.FC<TableProps> = ({
   enableFilterByCharge = false,
   enableXlsxUpload = true,
   tableName,
+  minimal = false,
 }) => {
+  const { produitFields } = useFormFields();
   const [contextMenu, setContextMenu] = React.useState<{
     mouseX: number;
     mouseY: number;
@@ -233,12 +236,14 @@ const Table: React.FC<TableProps> = ({
     columns,
     data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
     enableColumnResizing: true,
-    enablePagination: true,
-    enableFullScreenToggle: true,
+    enablePagination: !minimal,
+    enableFullScreenToggle: !minimal,
     enableStickyHeader: true,
     enableEditing: enableEditing,
     enableDensityToggle: false,
-    enableRowActions: true,
+    enableRowActions: !minimal,
+    enableBottomToolbar: !minimal,
+    enableTopToolbar: !minimal,
     localization: { ...MRT_Localization_FR, rowsPerPage: "" },
 
     initialState: {
@@ -422,10 +427,16 @@ const Table: React.FC<TableProps> = ({
           colorStyle = { sx: { color: "red" } };
           break;
         case 1:
+          colorStyle = { sx: { color: "orange" } };
+          break;
+        case 2:
+          colorStyle = { sx: { color: "#60A4FA" } };
+          break;
+        case 3:
           colorStyle = { sx: { color: "green" } };
           break;
         default:
-          colorStyle = { sx: { color: "black" } };
+          break;
       }
 
       if (typeof cell.getValue() === "boolean") {
@@ -476,6 +487,7 @@ const Table: React.FC<TableProps> = ({
               onClose={() => setContextMenu(null)}
               handleCrudMenuClose={handleCrudMenuClose}
               currentTable={tableName}
+              row={contextMenu?.row}
             />
 
             {enableFilterByCharge && (

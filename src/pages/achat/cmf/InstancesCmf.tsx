@@ -17,21 +17,19 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 
-import {
-  getBesoins,
-  getCommandes,
-  getDemandesDevis,
-  getDeviss,
-} from "../../../api/achat/achat_api";
 import useColumns from "../../../hooks/useColumns";
 import InfoCard from "../../../components/TableCard";
 import Table from "../../../components/Table";
 import CmfInfo from "./CmfInfo";
 import AchatElemInstance from "../AchatElemInstance";
+import useAchatApi from "../../../api/achat/achat_api";
 
 type Props = {};
 
 const InstancesCmf: React.FC<Props> = (props: Props) => {
+  const { getBesoins, getCommandes, getDemandesDevis, getDeviss } =
+    useAchatApi();
+
   //     const cmf = useQuery({
   //     queryKey: ['cmf'],
   //     queryFn: getCommandes,

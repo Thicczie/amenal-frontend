@@ -15,36 +15,20 @@ import {
   FormControlLabel,
   Radio,
   TextField,
+  Button,
 } from "@mui/material";
 import { useQueryClient, useQueries, useMutation } from "@tanstack/react-query";
 import { Formik, Form, useField } from "formik";
 import React, { useMemo } from "react";
-import { Fields, lotFields } from "../constants/FormFields";
+import { Fields } from "../constants/FormFields";
 import { parseFields } from "../hooks/parseFields";
 import { DatePicker } from "@mui/x-date-pickers";
-import {
-  saveAvenant,
-  saveDetailCharge,
-  saveDetailProduit,
-  saveDetailQualite,
-  saveLot,
-  saveProduit,
-  saveProjet,
-  saveTache,
-} from "../api/crudAPI";
+import useCrudApi from "../api/crudAPI";
 import { useAppContext } from "../contexts/AppContext";
-import {
-  saveBesoin,
-  saveChargeStandard,
-  saveCommande,
-  saveDemandeDevis,
-  saveDevis,
-  saveFacture,
-  saveFournisseur,
-  savePaiement,
-  saveReception,
-} from "../api/achat/achat_Crud";
+import useAchatCrud from "../api/achat/achat_Crud";
 import { Dialog } from "@capacitor/dialog";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 type Props = {
   formFields: Fields;
@@ -53,10 +37,42 @@ type Props = {
 };
 
 const AddForm: React.FC<Props> = (props: Props) => {
+  const {
+    saveAvenant,
+    saveDetailCharge,
+    saveDetailProduit,
+    saveDetailQualite,
+    saveLot,
+    saveMetre,
+    saveProduit,
+    saveProjet,
+    saveTache,
+    saveDelaiAttente,
+    saveProduitAttente,
+    saveChargeAttente,
+    saveQualiteAttente,
+  } = useCrudApi();
+  const {
+    saveBesoin,
+    saveChargeStandard,
+    saveCommande,
+    saveDemandeDevis,
+    saveDevis,
+    saveFacture,
+    saveFournisseur,
+    savePaiement,
+    saveReception,
+    saveDetailReception,
+  } = useAchatCrud();
   const { projectId, avenantId } = useAppContext();
   const formFields = props.formFields;
 
-  const client = useQueryClient();
+  const [isdetailRecError, setIsdetailRecError] = React.useState({
+    isdetailRecError: false,
+    message: "",
+  });
+
+  const queryClient = useQueryClient();
 
   const selectItems = formFields
     ? useQueries({
@@ -76,8 +92,8 @@ const AddForm: React.FC<Props> = (props: Props) => {
         ?.filter(([key, val]) => val?.type == "select")
         ?.reduce((acc: any, [key, val]: any) => {
           acc[key] =
-            (client.getQueryData(["add", key]) as any)?.data ||
-            client.getQueryData(["add", key]) ||
+            (queryClient.getQueryData(["add", key]) as any)?.data ||
+            queryClient.getQueryData(["add", key]) ||
             null;
           return acc;
         }, {})
@@ -102,24 +118,31 @@ const AddForm: React.FC<Props> = (props: Props) => {
         "context: ",
         context
       );
-      if (data?.status == 200 || data?.status == 201) {
+
+      if (data?.status == 400 && variables.currentForm == "detailReceptions") {
+        setIsdetailRecError({
+          isdetailRecError: true,
+          message: data?.data,
+        });
+        return;
+      } else if (data?.status == 200 || data?.status == 201) {
         console.log("mutation success");
-        Dialog.alert({
-          title: "Success",
-          message: "Ajouté!",
-        }).then(() => (props?.setDialogOpen ? false : null));
-      } else if (data?.status == 401) {
+        props?.setDialogOpen && props?.setDialogOpen(false);
+        toast.success("Ajouté!");
+        queryClient.invalidateQueries();
+      } else if (data?.status == 401 || data?.status == 409) {
         console.log("entry already exists");
-        Dialog.alert({
-          title: "Error",
-          message: "Cet element existe déjà!",
-        }).then(() => (props?.setDialogOpen ? false : null));
+        toast.error("L'enregistrement existe déjà");
+      } else if (data?.status == 403) {
+        props?.setDialogOpen && props?.setDialogOpen(false);
+        toast.error("Accès non autorisé");
       } else {
         console.log("mutation failed");
-        Dialog.alert({
-          title: "Error",
-          message: "Erreur! " + data?.originalError?.message,
-        }).then(() => (props?.setDialogOpen ? false : null));
+        toast.error("Erreur! " + data?.originalError?.message, {
+          style: {
+            zIndex: 1000,
+          },
+        });
       }
     },
   });
@@ -162,7 +185,24 @@ const AddForm: React.FC<Props> = (props: Props) => {
       case "paiement":
         return savePaiement(data);
       case "reception":
+        data.transports = [data?.transports];
         return saveReception(data);
+      case "metre":
+        return saveMetre(data);
+      case "detailProduitAttentes":
+        return saveProduitAttente(data);
+      case "detailChargeAttentes":
+        return saveChargeAttente(data);
+      case "detailDelaiAttentes":
+        return saveDelaiAttente(data);
+      case "detailQualiteAttentes":
+        return saveQualiteAttente(data);
+      case "detailReceptions":
+        data.detailCommandeId = data?.detailCommandeId?.id;
+        data.receptionId = data?.receptionId?.id;
+        return saveDetailReception(data);
+
+      //return saveDetailReception(data);
       default:
         console.log("no form mutation function found");
         break;
@@ -233,10 +273,17 @@ const AddForm: React.FC<Props> = (props: Props) => {
                 </InputField>
               ))
             : null}
-
-          <IonButton type="submit" className="m-2">
-            Submit
-          </IonButton>
+          <div className="text-center text-red-500">
+            {isdetailRecError && <span>{isdetailRecError?.message}</span>}
+          </div>
+          <Button
+            sx={{ mt: 2 }}
+            color="primary"
+            variant="contained"
+            type="submit"
+          >
+            Ajouter
+          </Button>
         </Form>
       </Formik>
     </div>

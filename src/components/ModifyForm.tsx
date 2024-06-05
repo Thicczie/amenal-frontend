@@ -15,26 +15,20 @@ import {
   FormControlLabel,
   Radio,
   TextField,
+  Button,
 } from "@mui/material";
 import { useQueryClient, useQueries, useMutation } from "@tanstack/react-query";
 import { Formik, Form, useField } from "formik";
 import React, { useMemo } from "react";
-import { Fields, lotFields } from "../constants/FormFields";
+import { Fields } from "../constants/FormFields";
 import { parseFields } from "../hooks/parseFields";
 import { DatePicker } from "@mui/x-date-pickers";
-import {
-  saveAvenant,
-  saveDetailCharge,
-  saveDetailProduit,
-  saveDetailQualite,
-  saveLot,
-  saveProduit,
-  saveTache,
-} from "../api/crudAPI";
+import useCrudApi from "../api/crudAPI";
 import { useAppContext } from "../contexts/AppContext";
 import { MRT_Row, MRT_TableInstance } from "material-react-table";
 import { Dialog } from "@capacitor/dialog";
 import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 type Props = {
   formFields: Fields;
@@ -44,6 +38,17 @@ type Props = {
 };
 
 const ModifyForm: React.FC<Props> = (props: Props) => {
+  const {
+    updateAvenant,
+    updateDetailCharge,
+    updateDetailProduit,
+    updateDetailQualite,
+    updateLot,
+    updateMetre,
+    updateProduit,
+    updateProjet,
+    updateTache,
+  } = useCrudApi();
   const { projectId, avenantId } = useParams();
 
   const formFields = props.formFields;
@@ -53,7 +58,7 @@ const ModifyForm: React.FC<Props> = (props: Props) => {
   const selectItems = formFields
     ? useQueries({
         queries: Object.entries(formFields)
-          ?.filter(([key, val]) => val?.type == "select")
+          ?.filter(([key, val]) => val?.type == "select" && !val.notModifiable)
           ?.map(([key, val]) => ({
             queryKey: ["add", key],
             queryFn: () =>
@@ -65,7 +70,7 @@ const ModifyForm: React.FC<Props> = (props: Props) => {
 
   const selectData: any = formFields
     ? Object.entries(formFields)
-        ?.filter(([key, val]) => val?.type == "select")
+        ?.filter(([key, val]) => val?.type == "select" && !val.notModifiable)
         ?.reduce((acc: any, [key, val]: any) => {
           acc[key] =
             (client.getQueryData(["add", key]) as any)?.data ||
@@ -96,47 +101,76 @@ const ModifyForm: React.FC<Props> = (props: Props) => {
       );
       if (data?.status == 200 || data?.status == 201) {
         console.log("mutation success");
-        Dialog.alert({
-          title: "Success",
-          message: "Ajouté!",
-        }).then(() => props.table.setEditingRow(null));
+        toast.success("Modifié!");
+        props.table.setEditingRow(null);
+        client.invalidateQueries();
+      } else if (data?.status == 403) {
+        props?.table.setEditingRow(null);
+        toast.error("Accès non autorisé");
       } else if (data?.status == 401) {
         console.log("entry already exists");
-        Dialog.alert({
-          title: "Error",
-          message: "Cet element existe déjà!",
-        }).then(() => props.table.setEditingRow(null));
+        toast.error("L'enregistrement existe déjà");
+        props?.table.setEditingRow(null);
       } else {
         console.log("mutation failed");
-        Dialog.alert({
-          title: "Error",
-          message: "Erreur! " + data?.originalError?.message,
-        }).then(() => props.table.setEditingRow(null));
+        toast.error("Erreur! " + data?.originalError?.message);
+        props.table.setEditingRow(null);
       }
     },
   });
 
-  async function handleAdd(data: any, currentForm: string) {
+  async function handleAdd(addData: any, currentForm: string) {
+    var data = { id: props.row.original.id, ...addData };
+
     console.log("dataaaaaaa", data, currentForm);
     switch (currentForm) {
       case "lot":
-        return saveLot(data);
+        return updateLot(data);
       case "produit":
-        return saveProduit(data);
+        return updateProduit(data);
       case "tache":
-        return saveTache(data);
+        return updateTache(data);
       case "detailProduit":
-        return saveDetailProduit(data);
+        return updateDetailProduit(data);
       case "detailCharge":
-        return saveDetailCharge(data);
+        return updateDetailCharge(data);
       case "detailDelai":
         return;
       case "detailQualite":
-        return saveDetailQualite(data);
+        return updateDetailQualite(data);
       case "avenant":
-        return saveAvenant(data);
+        return updateAvenant(data);
       case "budget":
+        return updateProduit(data);
+      case "metre":
+        return updateMetre(data);
+      case "detailProduitAttentes":
         return;
+      case "detailChargeAttentes":
+        return;
+      case "detailQualiteAttentes":
+        return;
+      case "detailDelaiAttentes":
+        return;
+      case "bsn":
+        return;
+      case "chg":
+        return;
+      case "cmf":
+        return;
+      case "ddf":
+        return;
+      case "dvf":
+        return;
+      case "fcf":
+        return;
+      case "frs":
+        return;
+      case "pmf":
+        return;
+      case "rcf":
+        return;
+
       default:
         console.log("no form found");
 
@@ -148,8 +182,9 @@ const ModifyForm: React.FC<Props> = (props: Props) => {
     //this prevents form input value manipulation
     const submitData: any = { ...data };
 
+    //transforming select values
     Object.entries(formFields)?.map(([key, val]) => {
-      if (val?.type == "select") {
+      if (val?.type == "select" && !val.notModifiable) {
         submitData[key] = selectData[key].filter(
           (item: any) => item.id == submitData[key]
         )[0];
@@ -157,8 +192,7 @@ const ModifyForm: React.FC<Props> = (props: Props) => {
     });
 
     const parsedData = parseFields(submitData, formFields);
-    console.log("parsedData", parsedData);
-    //  mutation.mutateAsync({data:parsedData ,currentForm: props.currentForm});
+    mutation.mutateAsync({ data: parsedData, currentForm: props.currentForm });
   }
 
   const renderSelectMenuItems = (key: any, val: any) => {
@@ -177,42 +211,50 @@ const ModifyForm: React.FC<Props> = (props: Props) => {
   };
 
   function defaultValues(row: MRT_Row<any>, formFields: Fields) {
-    return Object.fromEntries(
-      Object.entries(formFields)?.map(([key, val]) =>
-        val?.type == "select"
-          ? [key, row?.original[val?.foreignKey ?? ""] ?? row?.original?.id]
-          : [key, row.original[key]]
-      )
+    var values = Object.fromEntries(
+      Object.entries(formFields)
+        ?.filter(([key, val]) => !(val?.type === "select" && val.notModifiable))
+        ?.map(([key, val]) =>
+          val?.type === "select" && !val.notModifiable
+            ? [key, row?.original[val?.foreignKey ?? ""] ?? row?.original?.id]
+            : [key, row.original[key]]
+        )
     );
+
+    return values;
   }
 
   return (
     <Formik
       initialValues={defaultValues(props.row, formFields)}
       onSubmit={(values) => {
+        console.log("values", values);
         Submit(values, formFields);
-        //console.log('values', values);
       }}
     >
       <Form className=" flex justify-center m-2 flex-col ">
         {formFields
-          ? Object.entries(formFields)?.map(([key, val]) => (
-              <InputField
-                key={key}
-                name={key}
-                label={val.label}
-                type={val.type}
-                radio={val?.type === "boolean"}
-                select={val.type === "select"}
-              >
-                {val.type === "select" && renderSelectMenuItems(key, val)}
-              </InputField>
-            ))
+          ? Object.entries(formFields)?.map(([key, val]) =>
+              !val?.notModifiable ? (
+                <InputField
+                  key={key}
+                  name={key}
+                  label={val.label}
+                  type={val.type}
+                  radio={val?.type === "boolean"}
+                  select={val.type === "select"}
+                >
+                  {val.type === "select" && renderSelectMenuItems(key, val)}
+                </InputField>
+              ) : (
+                <></>
+              )
+            )
           : null}
 
-        <IonButton type="submit" className="m-2">
+        <Button className="m-2" variant="contained" type="submit">
           Modifier
-        </IonButton>
+        </Button>
       </Form>
     </Formik>
   );

@@ -27,7 +27,7 @@ const PageHeader: React.FC<Props> = ({ enableMenuButton = true, ...props }) => {
   return (
     <>
       <AppBar position="static">
-        <Toolbar>
+        <Toolbar sx={{ paddingTop: "env(safe-area-inset-top)" }}>
           {enableMenuButton ? <SideMenuButton /> : <BackButton />}
           <IonTitle>{props.title}</IonTitle>
           {props.children}

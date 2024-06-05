@@ -56,6 +56,8 @@ import AllDetails from "../pages/budget/AllDetails";
 import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
 import RequireAuth from "../components/auth/RequireAuth";
+import Users from "../pages/Users";
+import Unauthorized from "../pages/unauthorized";
 
 //TODO : non linear routing
 
@@ -324,12 +326,14 @@ interface Props {
   children?: React.ReactNode;
 }
 export const Router: React.FC<Props> = ({ children }) => {
+  const standardRoles = ["ADMIN", "USER", "SUPMANAGER", "MANAGER"];
+
   return (
     <>
       <BrowserRouter>
         {children}
         <Routes>
-          <Route element={<RequireAuth />}>
+          <Route element={<RequireAuth allowedRoles={"all"} />}>
             <Route path="/" element={<Home />} />
             <Route path="/budget" element={<CompteBdg />}>
               <Route index path="instances" element={<Instances />} />
@@ -420,6 +424,12 @@ export const Router: React.FC<Props> = ({ children }) => {
           </Route>
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          {/* <Route element={<RequireAuth allowedRoles={"ADMIN"} />}> */}
+          <Route path="/users" element={<Users />} />
+          {/* </Route> */}
+          {/* <Route path="*" element={<NotFound />} /> */}
+          <Route path="*" element={<Navigate to="/home" />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
         </Routes>
       </BrowserRouter>
     </>

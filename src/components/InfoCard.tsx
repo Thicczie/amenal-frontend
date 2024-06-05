@@ -23,22 +23,11 @@ import {
   TLayout,
   ILayout,
 } from "../constants/infoLayout";
-import { getProjectById, getAvenantById } from "../api/api";
+import useApi from "../api/api";
 import { useQuery } from "@tanstack/react-query";
 import Details from "../pages/budget/Details";
 import { useAppContext } from "../contexts/AppContext";
-import {
-  getBesoins,
-  getBesoinsById,
-  getChargeStandardsById,
-  getCommandesById,
-  getDemandesDevisById,
-  getDevissById,
-  getFacturesById,
-  getFournisseursById,
-  getPaiementsById,
-  getReceptionsById,
-} from "../api/achat/achat_api";
+import useAchatApi from "../api/achat/achat_api";
 import { useParams } from "react-router-dom";
 import { InfoOutlined } from "@mui/icons-material";
 import {
@@ -63,8 +52,21 @@ const InfoCard: React.FC<InfoCardProps> = ({
 }) => {
   //const Layout = currentInfo === "AV" ? AvLayout : BdgLayout;
   // const TitleLayout = currentInfo === "AV" ? AvTitleLayout : BdgTitleLayout;
+  const {
+    getBesoins,
+    getBesoinsById,
+    getChargeStandardsById,
+    getCommandesById,
+    getDemandesDevisById,
+    getDevissById,
+    getFacturesById,
+    getFournisseursById,
+    getPaiementsById,
+    getReceptionsById,
+  } = useAchatApi();
   const { projectId, avenantId, id } = useParams();
   //const { id }:any =useHistory().location.state ?? {};
+  const { getProjectById, getAvenantById } = useApi();
 
   const fetchInfo = () => {
     switch (currentInfo) {
@@ -106,6 +108,9 @@ const InfoCard: React.FC<InfoCardProps> = ({
         return "text-red-500";
       case 1:
         return "text-green-500";
+      case 2:
+        return "text-blue-400";
+
       default:
         return "";
     }

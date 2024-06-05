@@ -1,14 +1,13 @@
-import React from 'react';
-import Ajout from '../../Ajout';
-import { frsFields } from '../../../constants/FormFields';
+import React from "react";
+import Ajout from "../../Ajout";
+import useFormFields from "../../../constants/FormFields";
 
-type Props = {}
+type Props = {};
 
-const AjoutFrs:React.FC = (props: Props) => {
-  return (
-    <Ajout FormName="fournisseur" formFields={frsFields} />
-  
-  )
-}
+const AjoutFrs: React.FC = (props: Props) => {
+  const { frsFields } = useFormFields();
 
-export default AjoutFrs
+  return <Ajout FormName="fournisseur" formFields={frsFields} />;
+};
+
+export default AjoutFrs;

@@ -19,9 +19,9 @@ type Props = {};
 const Chgs: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   navigate("instances");
-  // }, [navigate]);
+  useEffect(() => {
+    navigate("instances");
+  }, []);
 
   return (
     <>

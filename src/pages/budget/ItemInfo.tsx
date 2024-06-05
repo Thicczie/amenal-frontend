@@ -11,7 +11,7 @@ import {
 } from "@ionic/react";
 
 import { useQuery } from "@tanstack/react-query";
-import { getAvenantsByProjectId } from "../../api/api";
+import useApi from "../../api/api";
 import useColumns from "../../hooks/useColumns";
 import InfoCard from "../../components/InfoCard";
 import TableCard from "../../components/TableCard";
@@ -27,11 +27,7 @@ import {
   Fab,
 } from "@mui/material";
 import AddForm from "../AddForm";
-import {
-  avenantFields,
-  budgetFields,
-  produitFields,
-} from "../../constants/FormFields";
+import useFormFields from "../../constants/FormFields";
 
 import AddDialogButton from "../../components/AddDialogButton";
 import SigmaCheckbox from "../../components/SigmaCheckbox";
@@ -47,6 +43,8 @@ import FabDialog from "../../components/fabDialog";
 //this is the BDG screen
 
 const ItemInfo: React.FC = () => {
+  const { avenantFields, budgetFields, produitFields } = useFormFields();
+  const { getAvenantsByProjectId } = useApi();
   const { setAvenantId, currentSigma } = useAppContext();
   const { projectId } = useParams();
 

@@ -11,7 +11,7 @@ import {
 import SideMenuButton from "../components/SideMenu";
 import PageHeader from "../components/PageHeader";
 import { useQuery } from "@tanstack/react-query";
-import apiClient from "../api/apiClient";
+
 import { Card, CardContent, Grid, Typography } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 import ApartmentIcon from "@mui/icons-material/Apartment";
@@ -21,12 +21,16 @@ import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import TableCard from "../components/TableCard";
 import { MRT_Column, MRT_ColumnDef } from "material-react-table";
 import useColumns from "../hooks/useColumns";
+import useAuth from "../hooks/useAuth";
+import { useEffect } from "react";
+import useApiClient from "../api/apiClient";
 
 const Home: React.FC = () => {
   const { isLoading, data, isError } = useQuery({
     queryKey: ["dashBoardSummary"],
     queryFn: () => getDashboardSummary(),
   });
+  const apiClient = useApiClient();
 
   const getDashboardSummary = async () => {
     return apiClient.get("/homeDashboard");
@@ -42,14 +46,17 @@ const Home: React.FC = () => {
   const receptionsDeCetteSemaineColumns = useColumns(
     dashboardData?.receptionsDeCetteSemaine
   );
+
+  const { setAuthTokens, AuthToken } = useAuth();
+
   return (
     <IonPage>
       <PageHeader title="Home" />
       <IonContent>
         <Typography
-          className="  text-slate-600"
+          className="  text-slate-600 font-bold"
           variant="h5"
-          sx={{ padding: "0.5rem" }}
+          sx={{ padding: "0.5rem", fontWeight: "semibold" }}
         >
           Tableau de bord
         </Typography>
@@ -59,28 +66,28 @@ const Home: React.FC = () => {
             <DashBoardCard
               title="Projets Totaux"
               value={dashboardData?.totalProjets}
-              icon={<ApartmentIcon />}
+              icon={<ApartmentIcon htmlColor="#FF9600" />}
             />
           </Grid>
           <Grid item xs={6} sm={6} md={3} lg={3}>
             <DashBoardCard
               title="Total charges à venir "
               value={dashboardData?.totalTachesAVenir}
-              icon={<PaymentsIcon />}
+              icon={<PaymentsIcon htmlColor="#4CAF50" />}
             />
           </Grid>
           <Grid item xs={6} sm={6} md={3} lg={3}>
             <DashBoardCard
               title="Total charges budgetisées"
               value={dashboardData?.totalChargesBudgetise}
-              icon={<AccountBalanceWalletIcon />}
+              icon={<AccountBalanceWalletIcon htmlColor="#0072C8" />}
             />
           </Grid>
           <Grid item xs={6} sm={6} md={3} lg={3}>
             <DashBoardCard
               title="Dépenses totales"
               value={dashboardData?.totalDepenses}
-              icon={<PaidOutlinedIcon />}
+              icon={<PaidOutlinedIcon htmlColor="#2196F3" />}
             />
           </Grid>
           {/*tables */}
@@ -146,6 +153,7 @@ const DashBoardTable: React.FC<dashboardTableProps> = (
       data={props.data}
       isPending={props.isPending}
       isError={props.isError}
+      minimal
     />
   );
 };
@@ -170,7 +178,7 @@ const DashBoardCard: React.FC<dashboardCardProps> = (
       }}
     >
       <CardContent className="relative">
-        <div className=" text-gray-500 flex justify-start whitespace-nowrap ">
+        <div className=" text-gray-500 text-sm flex justify-start whitespace-nowrap ">
           {props.title}
         </div>
         <div className="w-fit  flex justify-start font-normal  text-slate-600  text-3xl ">
